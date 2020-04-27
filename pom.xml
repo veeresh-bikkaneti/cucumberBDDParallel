@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.cucumberbddprallel</groupId>
+    <artifactId>cucumberbddprallel</artifactId>
+    <packaging>jar</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <properties>
+        <cluecumber-report-plugin.version>2.3.4</cluecumber-report-plugin.version>
+        <failsafe.testFailureIgnore.version>true</failsafe.testFailureIgnore.version>
+        <cucable-plugin.sourceFeatures>src/test/resources/features</cucable-plugin.sourceFeatures>
+        <cluecumber-report-plugin.version>2.2.0</cluecumber-report-plugin.version>
+        <cucumber.report.json.location>${project.build.directory}/cucumber-report/</cucumber.report.json.location>
+        <generated.report.location>${project.build.directory}/ClucumberReports/</generated.report.location>
+        <generated.runner.directory>${project.build.directory}/parallel/runners</generated.runner.directory>
+        <generated.feature.directory>${project.build.directory}/parallel/features</generated.feature.directory>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+        <testng.version>6.14.2</testng.version>
+        <cucumber.version>5.6.0</cucumber.version>
+        <selenium.version>3.141.59</selenium.version>
+        <maven.failsafe.plugin.version>3.0.0-M3</maven.failsafe.plugin.version>
+        <maven.build.helper.plugin.version>3.0.0</maven.build.helper.plugin.version>
+        <generated.runner.directory>${project.build.directory}/parallel/runners</generated.runner.directory>
+        <generated.feature.directory>${project.build.directory}/parallel/features</generated.feature.directory>
+    </properties>
+    <build>
+        <finalName>cucumbertestngparallel-${project.version}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.7.0</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.trivago.rta</groupId>
+                <artifactId>cucable-plugin</artifactId>
+                <version>1.5.2</version>
+                <executions>
+                    <execution>
+                        <id>generate-test-resources</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>parallel</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- This can be either a Java class file or a text based template -->
+                    <sourceRunnerTemplateFile>src/test/resources/cucable.template</sourceRunnerTemplateFile>
+                    <!-- process all features in the given directory -->
+                    <sourceFeatures>src/test/resources/features</sourceFeatures>
+                    <generatedFeatureDirectory>${generated.feature.directory}</generatedFeatureDirectory>
+                    <generatedRunnerDirectory>${generated.runner.directory}</generatedRunnerDirectory>
+                    <!--<includeScenarioTags>@scenario1Tag1</includeScenarioTags>-->
+                    <!--<includeScenarioTags>not @skipMe</includeScenarioTags>-->
+                    <!--<includeScenarioTags>(@scenario1Tag1 or @scenario1Tag2) and not @skipMe</includeScenarioTags>-->
+                    <!-- optional: change parallelization mode of Cucable (default: 'scenarios')-->
+                    <!--<parallelizationMode>scenarios</parallelizationMode>-->
+                    <parallelizationMode>features</parallelizationMode>
+                    <!--<numberOfTestRuns>1</numberOfTestRuns>-->
+                    <!--<desiredNumberOfRunners>2</desiredNumberOfRunners>-->
+                    <!--<desiredNumberOfFeaturesPerRunner>4</desiredNumberOfFeaturesPerRunner>-->
+                    <logLevel>default</logLevel>
+                    <!--<logLevel>compact</logLevel>-->
+                    <!--<logLevel>minimal</logLevel>-->
+                    <!--<logLevel>off</logLevel>-->
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${maven.build.helper.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>add-test-source</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${generated.runner.directory}</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${maven.failsafe.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>Run parallel tests</id>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <forkCount>2</forkCount>
+                    <testFailureIgnore>true</testFailureIgnore>
+                    <includes>
+                        <include>**/*IT.class</include>
+                        <include>**/*RestIT</include>
+                        <include>**/RestITCase</include>
+                    </includes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <!--      start      parallel ft plugins start-->
+        <profile>
+            <id>integration-test</id>
+            <build>
+                <plugins>
+                    <!--            begin ft plugins-->
+                    <plugin>
+                        <groupId>com.trivago.rta</groupId>
+                        <artifactId>cucable-plugin</artifactId>
+                        <version>1.5.2</version>
+                        <executions>
+                            <execution>
+                                <id>generate-test-resources</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>parallel</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <sourceRunnerTemplateFile>src/test/resources/cucable.template</sourceRunnerTemplateFile>
+                            <sourceFeatures>${cucable-plugin.sourceFeatures}</sourceFeatures>
+                            <generatedFeatureDirectory>${generated.feature.directory}</generatedFeatureDirectory>
+                            <generatedRunnerDirectory>${generated.runner.directory}</generatedRunnerDirectory>
+                            <!--                                                        <parallelizationMode>scenarios</parallelizationMode>-->
+                            <parallelizationMode>features</parallelizationMode>
+                            <numberOfTestRuns>1</numberOfTestRuns>
+                            <logLevel>default</logLevel>
+                        </configuration>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <version>${maven.build.helper.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>add-test-source</id>
+                                <phase>generate-test-sources</phase>
+                                <goals>
+                                    <goal>add-test-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>${generated.runner.directory}</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>${maven.failsafe.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>Run parallel tests</id>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <testFailureIgnore>${failsafe.testFailureIgnore.version}</testFailureIgnore>
+                            <forkCount>2</forkCount>
+                            <reuseForks>true</reuseForks>
+                            <argLine>-Dfile.encoding=UTF-8</argLine>
+                            <disableXmlReport>true</disableXmlReport>
+                            <skipTests>false</skipTests>
+                            <includes>
+                                <include>**/*IT.class</include>
+                                <include>**/*RestIT</include>
+                                <include>**/RestITCase</include>
+                            </includes>
+                        </configuration>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>com.trivago.rta</groupId>
+                        <artifactId>cluecumber-report-plugin</artifactId>
+                        <version>${cluecumber-report-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>execution</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>reporting</goal>
+                                </goals>
+                            </execution>
+
+                        </executions>
+                        <configuration>
+                            <sourceJsonReportDirectory>${cucumber.report.json.location}</sourceJsonReportDirectory>
+                            <generatedHtmlReportDirectory>${generated.report.location}</generatedHtmlReportDirectory>
+                            <!--                            <customParameters>-->
+                            <!--                                <Custom_Parameter>${project.build.finalName}</Custom_Parameter>-->
+                            <!--                            </customParameters>-->
+                            <customParameters>
+                                <Custom_Parameter>${project.artifactId}-${project.version}</Custom_Parameter>
+                            </customParameters>
+                            <customStatusColorPassed>#017FAF</customStatusColorPassed>
+                            <customStatusColorFailed>#C94A38</customStatusColorFailed>
+                            <customStatusColorSkipped>#F48F00</customStatusColorSkipped>
+                            <customPageTitle>${project.build.finalName}</customPageTitle>
+                            <failScenariosOnPendingOrUndefinedSteps>true</failScenariosOnPendingOrUndefinedSteps>
+                            <expandBeforeAfterHooks>true</expandBeforeAfterHooks>
+                            <expandStepHooks>true</expandStepHooks>
+                            <expandDocStrings>true</expandDocStrings>
+                            <logLevel>default</logLevel>
+                        </configuration>
+                    </plugin>
+
+
+                    <plugin>
+                        <groupId>net.masterthought</groupId>
+                        <artifactId>maven-cucumber-reporting</artifactId>
+                        <version>5.0.0</version>
+                        <executions>
+                            <execution>
+                                <id>execution</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                                <configuration>
+                                    <projectName>${project.build.finalName}</projectName>
+                                    <!-- optional, per documentation set this to "true" to bypass generation of Cucumber Reports entirely, defaults to false if not specified -->
+                                    <skip>false</skip>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                    <inputDirectory>${cucumber.report.json.location}</inputDirectory>
+                                    <jsonFiles>
+                                        <param>**/*.json</param>
+                                    </jsonFiles>
+                                    <classificationDirectory>${project.build.directory}/classifications
+                                    </classificationDirectory>
+                                    <checkBuildResult>false</checkBuildResult>
+                                </configuration>
+
+                            </execution>
+
+                        </executions>
+
+                    </plugin>
+                    <!--            end ft plugins-->
+                </plugins>
+            </build>
+        </profile>
+        <!--    End        parallel ft plugins end-->
+    </profiles>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>${selenium.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.bonigarcia</groupId>
+            <artifactId>webdrivermanager</artifactId>
+            <version>3.6.1</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-java</artifactId>
+            <version>${cucumber.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-picocontainer</artifactId>
+            <version>${cucumber.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-testng</artifactId>
+            <version>${cucumber.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+</project>
+
+
