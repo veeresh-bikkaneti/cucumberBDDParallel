@@ -4,7 +4,6 @@ import com.cucumberparallel.basepage.BasePage;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.PageFactory;
 import org.testng.Assert;
 
 
@@ -20,7 +19,6 @@ public class HomePage extends BasePage{
 
 
     HomePage() {
-        PageFactory.initElements(driver, this);
     }
 
     void goToHomePage(String country){

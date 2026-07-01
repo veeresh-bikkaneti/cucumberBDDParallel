@@ -4,13 +4,13 @@ import io.cucumber.testng.CucumberOptions;
 @CucumberOptions(
 features = {"target/parallel/features/[CUCABLE:FEATURE].feature"},
 
-strict = true,
-        monochrome = true,
+monochrome = true,
         snippets = CucumberOptions.SnippetType.CAMELCASE,
 
 plugin = {"json:target/cucumber-report/[CUCABLE:RUNNER].json"},
 glue = {"com.cucumberparallel.hookup.driver",
-                       "com.cucumberparallel.SearchResultPageSteps"})
+                       "com.cucumberparallel.homepage",
+                       "com.cucumberparallel.searchresultpage"})
 
 public class [CUCABLE:RUNNER] extends AbstractTestNGCucumberTests {
 }

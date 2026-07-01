@@ -7,24 +7,25 @@
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
     <properties>
-        <cluecumber-report-plugin.version>2.3.4</cluecumber-report-plugin.version>
-        <failsafe.testFailureIgnore.version>true</failsafe.testFailureIgnore.version>
         <cucable-plugin.sourceFeatures>src/test/resources/features</cucable-plugin.sourceFeatures>
-        <cluecumber-report-plugin.version>2.2.0</cluecumber-report-plugin.version>
+        <cluecumber-report-plugin.version>2.9.4</cluecumber-report-plugin.version>
         <cucumber.report.json.location>${project.build.directory}/cucumber-report/</cucumber.report.json.location>
         <generated.report.location>${project.build.directory}/ClucumberReports/</generated.report.location>
         <generated.runner.directory>${project.build.directory}/parallel/runners</generated.runner.directory>
         <generated.feature.directory>${project.build.directory}/parallel/features</generated.feature.directory>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>1.8</java.version>
-        <testng.version>6.14.2</testng.version>
-        <cucumber.version>5.6.0</cucumber.version>
-        <selenium.version>3.141.59</selenium.version>
-        <maven.failsafe.plugin.version>3.0.0-M3</maven.failsafe.plugin.version>
-        <maven.build.helper.plugin.version>3.0.0</maven.build.helper.plugin.version>
-        <generated.runner.directory>${project.build.directory}/parallel/runners</generated.runner.directory>
-        <generated.feature.directory>${project.build.directory}/parallel/features</generated.feature.directory>
+        <java.version>21</java.version>
+        <testng.version>7.12.0</testng.version>
+        <cucumber.version>7.34.4</cucumber.version>
+        <selenium.version>4.45.0</selenium.version>
+        <webdrivermanager.version>6.3.4</webdrivermanager.version>
+        <cucable-plugin.version>1.16.0</cucable-plugin.version>
+        <maven.compiler.plugin.version>3.15.0</maven.compiler.plugin.version>
+        <maven.failsafe.plugin.version>3.5.6</maven.failsafe.plugin.version>
+        <maven.build.helper.plugin.version>3.6.1</maven.build.helper.plugin.version>
+        <maven.cucumber.reporting.version>5.11.0</maven.cucumber.reporting.version>
+        <failsafe.testFailureIgnore.version>true</failsafe.testFailureIgnore.version>
     </properties>
     <build>
         <finalName>cucumbertestngparallel-${project.version}</finalName>
@@ -32,7 +33,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.7.0</version>
+                <version>${maven.compiler.plugin.version}</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -41,7 +42,7 @@
             <plugin>
                 <groupId>com.trivago.rta</groupId>
                 <artifactId>cucable-plugin</artifactId>
-                <version>1.5.2</version>
+                <version>${cucable-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>generate-test-resources</id>
@@ -128,7 +129,7 @@
                     <plugin>
                         <groupId>com.trivago.rta</groupId>
                         <artifactId>cucable-plugin</artifactId>
-                        <version>1.5.2</version>
+                        <version>${cucable-plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>generate-test-resources</id>
@@ -238,7 +239,7 @@
                     <plugin>
                         <groupId>net.masterthought</groupId>
                         <artifactId>maven-cucumber-reporting</artifactId>
-                        <version>5.0.0</version>
+                        <version>${maven.cucumber.reporting.version}</version>
                         <executions>
                             <execution>
                                 <id>execution</id>
@@ -283,9 +284,8 @@
         <dependency>
             <groupId>io.github.bonigarcia</groupId>
             <artifactId>webdrivermanager</artifactId>
-            <version>3.6.1</version>
+            <version>${webdrivermanager.version}</version>
         </dependency>
-
 
         <dependency>
             <groupId>io.cucumber</groupId>
@@ -316,5 +316,3 @@
         </dependency>
     </dependencies>
 </project>
-
-

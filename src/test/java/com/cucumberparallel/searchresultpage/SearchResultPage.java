@@ -4,7 +4,6 @@ import com.cucumberparallel.basepage.BasePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.PageFactory;
 import org.testng.Assert;
 
 import java.util.List;
@@ -18,7 +17,6 @@ public class SearchResultPage extends BasePage {
     private List<WebElement> results;
 
     SearchResultPage() {
-        PageFactory.initElements(driver, this);
     }
 
     void checkExpectedUrlInResults(String expectedUrl, int nbOfResultsToSearch) {
