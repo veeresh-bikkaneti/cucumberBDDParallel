@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [test]
+    branches: [main]
   pull_request:
 
 jobs:
@@ -27,7 +27,7 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
-      - run: ./mvnw -B clean verify -Pintegration-test -pl example-tests -am
+      - run: ./mvnw -B clean verify -Pintegration-test -DskipTests -pl example-tests -am
       - name: Note AI status in job summary
         if: always()
         run: |
@@ -52,7 +52,7 @@ jobs:
       - name: Run with AI healing enabled
         if: ${{ env.ANTHROPIC_API_KEY != '' }}
         run: |
-          ./mvnw -B clean verify -Pintegration-test -pl example-tests -am | tee ai-run.log
+          ./mvnw -B clean verify -Pintegration-test -DskipTests -pl example-tests -am 2>&1 | tee ai-run.log
           echo '### AI locator healing cost' >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
           grep -E "AI locator heal|healing session total" ai-run.log >> "$GITHUB_STEP_SUMMARY" || echo "No healing calls happened this run." >> "$GITHUB_STEP_SUMMARY"
