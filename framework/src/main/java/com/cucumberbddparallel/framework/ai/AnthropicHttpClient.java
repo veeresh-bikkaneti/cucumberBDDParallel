@@ -18,8 +18,8 @@ final class AnthropicHttpClient implements ClaudeMessagesClient {
     private static final String ANTHROPIC_VERSION = "2023-06-01";
     private static final Pattern FIRST_TEXT_BLOCK =
             Pattern.compile("\"type\"\\s*:\\s*\"text\"\\s*,\\s*\"text\"\\s*:\\s*\"((?:\\\\.|[^\"\\\\])*)\"");
-    private static final Pattern USAGE_BLOCK = Pattern.compile(
-            "\"usage\"\\s*:\\s*\\{\\s*\"input_tokens\"\\s*:\\s*(\\d+)\\s*,\\s*\"output_tokens\"\\s*:\\s*(\\d+)");
+    private static final Pattern INPUT_TOKENS = Pattern.compile("\"input_tokens\"\\s*:\\s*(\\d+)");
+    private static final Pattern OUTPUT_TOKENS = Pattern.compile("\"output_tokens\"\\s*:\\s*(\\d+)");
 
     private static final HttpClient CLIENT = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(10))
@@ -64,10 +64,11 @@ final class AnthropicHttpClient implements ClaudeMessagesClient {
     }
 
     private static TokenUsage parseUsage(String responseJson) {
-        Matcher matcher = USAGE_BLOCK.matcher(responseJson);
-        if (!matcher.find()) {
-            return new TokenUsage(0, 0);
-        }
-        return new TokenUsage(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)));
+        return new TokenUsage(firstIntGroup(INPUT_TOKENS, responseJson), firstIntGroup(OUTPUT_TOKENS, responseJson));
+    }
+
+    private static int firstIntGroup(Pattern pattern, String text) {
+        Matcher matcher = pattern.matcher(text);
+        return matcher.find() ? Integer.parseInt(matcher.group(1)) : 0;
     }
 }
