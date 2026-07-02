@@ -1,4 +1,4 @@
-package com.cucumberparallel.homepage;
+package com.cucumberbddparallel.example.homepage;
 
 
 

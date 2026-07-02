@@ -1,4 +1,4 @@
-package com.cucumberparallel.searchresultpage;
+package com.cucumberbddparallel.example.searchresultpage;
 
 
 import io.cucumber.java.en.Then;

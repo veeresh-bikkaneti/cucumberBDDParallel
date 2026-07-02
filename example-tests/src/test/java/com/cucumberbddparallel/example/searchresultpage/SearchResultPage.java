@@ -1,9 +1,11 @@
-package com.cucumberparallel.searchresultpage;
+package com.cucumberbddparallel.example.searchresultpage;
 
-import com.cucumberparallel.basepage.BasePage;
+import com.cucumberbddparallel.framework.page.BasePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import java.util.List;
@@ -11,6 +13,7 @@ import java.util.stream.IntStream;
 
 public class SearchResultPage extends BasePage {
 
+    private static final Logger LOG = LoggerFactory.getLogger(SearchResultPage.class);
     private static final String RESULTS_URL_SELECTOR = "cite";
 
     @FindBy(css = RESULTS_URL_SELECTOR)
@@ -21,16 +24,12 @@ public class SearchResultPage extends BasePage {
 
     void checkExpectedUrlInResults(String expectedUrl, int nbOfResultsToSearch) {
         wait.forPresenceOfElements(5, By.cssSelector(RESULTS_URL_SELECTOR), "Result url");
-        Integer indexOfLink = IntStream.range(0, Math.min(this.results.size(), nbOfResultsToSearch))
+        int indexOfLink = IntStream.range(0, Math.min(this.results.size(), nbOfResultsToSearch))
                 .filter(index -> expectedUrl.equals(this.results.get(index).getText()))
                 .findFirst()
                 .orElse(-1);
-        boolean b = !indexOfLink.equals(-1);
-        System.out.println(("Url " + expectedUrl + " wasn't found in the results."+
-                b));
-        Assert.assertTrue(b);
-
-
+        boolean found = indexOfLink != -1;
+        LOG.info("Url \"{}\" wasn't found in the results: {}", expectedUrl, found);
+        Assert.assertTrue(found);
     }
 }
-

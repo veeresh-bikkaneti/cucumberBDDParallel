@@ -1,4 +1,4 @@
-package com.cucumberparallel.runner;
+package com.cucumberbddparallel.example.runner;
 
 import io.cucumber.testng.AbstractTestNGCucumberTests;
 import io.cucumber.testng.CucumberOptions;
@@ -10,8 +10,8 @@ import io.cucumber.testng.CucumberOptions;
         plugin = {"pretty",
         "json:target/cucumber_json_reports/search.json",
         "html:target/search-html"},
-        glue = {"com.cucumberparallel.hookup.driver",
-                "com.cucumberparallel.homepage",
-                "com.cucumberparallel.searchresultpage"})
+        glue = {"com.cucumberbddparallel.framework.driver",
+                "com.cucumberbddparallel.example.homepage",
+                "com.cucumberbddparallel.example.searchresultpage"})
 public class SearchTest extends AbstractTestNGCucumberTests {
 }
