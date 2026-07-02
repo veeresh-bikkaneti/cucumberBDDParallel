@@ -8,9 +8,9 @@ monochrome = true,
         snippets = CucumberOptions.SnippetType.CAMELCASE,
 
 plugin = {"json:target/cucumber-report/[CUCABLE:RUNNER].json"},
-glue = {"com.cucumberparallel.hookup.driver",
-                       "com.cucumberparallel.homepage",
-                       "com.cucumberparallel.searchresultpage"})
+glue = {"com.cucumberbddparallel.framework.driver",
+                       "com.cucumberbddparallel.example.homepage",
+                       "com.cucumberbddparallel.example.searchresultpage"})
 
 public class [CUCABLE:RUNNER] extends AbstractTestNGCucumberTests {
 }

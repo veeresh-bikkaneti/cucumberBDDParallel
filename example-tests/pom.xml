@@ -13,7 +13,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <cucable-plugin.sourceFeatures>src/test/resources/features</cucable-plugin.sourceFeatures>
+        <cucable-plugin.sourceFeatures>${project.basedir}/src/test/resources/features</cucable-plugin.sourceFeatures>
         <cucumber.report.json.location>${project.build.directory}/cucumber-report/</cucumber.report.json.location>
         <generated.report.location>${project.build.directory}/ClucumberReports/</generated.report.location>
         <generated.runner.directory>${project.build.directory}/parallel/runners</generated.runner.directory>
@@ -37,8 +37,8 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <sourceRunnerTemplateFile>src/test/resources/cucable.template</sourceRunnerTemplateFile>
-                    <sourceFeatures>src/test/resources/features</sourceFeatures>
+                    <sourceRunnerTemplateFile>${project.basedir}/src/test/resources/cucable.template</sourceRunnerTemplateFile>
+                    <sourceFeatures>${cucable-plugin.sourceFeatures}</sourceFeatures>
                     <generatedFeatureDirectory>${generated.feature.directory}</generatedFeatureDirectory>
                     <generatedRunnerDirectory>${generated.runner.directory}</generatedRunnerDirectory>
                     <parallelizationMode>features</parallelizationMode>
@@ -110,7 +110,7 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <sourceRunnerTemplateFile>src/test/resources/cucable.template</sourceRunnerTemplateFile>
+                            <sourceRunnerTemplateFile>${project.basedir}/src/test/resources/cucable.template</sourceRunnerTemplateFile>
                             <sourceFeatures>${cucable-plugin.sourceFeatures}</sourceFeatures>
                             <generatedFeatureDirectory>${generated.feature.directory}</generatedFeatureDirectory>
                             <generatedRunnerDirectory>${generated.runner.directory}</generatedRunnerDirectory>
