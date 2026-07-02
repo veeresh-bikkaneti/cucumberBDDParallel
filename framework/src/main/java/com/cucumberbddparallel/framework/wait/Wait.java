@@ -1,4 +1,4 @@
-package com.cucumberparallel.hookup.driver;
+package com.cucumberbddparallel.framework.wait;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -18,7 +18,7 @@ public class Wait {
         this.driver = driver;
     }
 
-    private void waitUntilCondition(ExpectedCondition condition, String timeoutMessage, int timeout) {
+    private <T> void waitUntilCondition(ExpectedCondition<T> condition, String timeoutMessage, int timeout) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
         wait.withMessage(timeoutMessage);
         wait.until(condition);
