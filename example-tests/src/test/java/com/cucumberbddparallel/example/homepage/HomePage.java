@@ -8,9 +8,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
+/**
+ * Page object for google.com's homepage - this is the example the whole `framework` module
+ * is built to support. Note there's no Selenium setup code here at all: extending
+ * {@code BasePage} gets you `driver`, `wait`, and working {@code @FindBy} fields for free.
+ * All this class does is describe the page and what a test can do with it.
+ */
 public class HomePage extends BasePage {
 
     private static final Logger LOG = LoggerFactory.getLogger(HomePage.class);
+    // "https://www.google." + a country code (e.g. "com", "fr") - see Home_page.feature for
+    // where the country comes from.
     private static final String HOME_PAGE_URL = "https://www.google.";
 
     @FindBy(css = "#hplogo")
@@ -19,6 +27,9 @@ public class HomePage extends BasePage {
     @FindBy(css = "input[name=q]")
     private WebElement searchInput;
 
+    // Package-private on purpose - only this package's step definitions (HomePageSteps)
+    // should be creating page objects. Step definitions are the only thing that should be
+    // driving the browser; nothing outside this package needs a HomePage instance.
     HomePage() {
     }
 

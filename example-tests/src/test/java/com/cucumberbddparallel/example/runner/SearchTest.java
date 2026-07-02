@@ -3,6 +3,11 @@ package com.cucumberbddparallel.example.runner;
 import io.cucumber.testng.AbstractTestNGCucumberTests;
 import io.cucumber.testng.CucumberOptions;
 
+/**
+ * Plain single-threaded runner for Search.feature - same idea as {@link HomePageTest}, and
+ * same caveat: keep {@code -DskipTests} on the build command so Surefire doesn't pick this
+ * up directly. See {@link HomePageTest}'s Javadoc for the full explanation.
+ */
 @CucumberOptions(
         features = {"src/test/resources/features/Search.feature"},
         monochrome = true,

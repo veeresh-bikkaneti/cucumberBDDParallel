@@ -91,14 +91,14 @@ available.
 Every healing call logs one line through SLF4J:
 
 ```
-AI locator heal: element=searchInput model=claude-sonnet-5 in=1842 out=12 cost=$0.006126
+AI locator heal: element=searchInput model=claude-sonnet-5 in=1842 out=12 cost=$0.005706
 ```
 
 A shutdown hook logs the running total for the JVM when the process
 exits:
 
 ```
-AI locator healing session total: $0.006126
+AI locator healing session total: $0.005706
 ```
 
 ### Reading cost in CI
