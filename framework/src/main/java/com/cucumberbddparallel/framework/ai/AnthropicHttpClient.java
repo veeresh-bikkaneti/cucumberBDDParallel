@@ -12,12 +12,33 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Talks to Claude's Messages API directly over {@code java.net.http} - no Anthropic SDK,
+ * no extra dependency. For one HTTP call with a tiny JSON body, pulling in a whole SDK
+ * felt like more than this needed. If the request payload ever grows past "one system
+ * prompt, one user message," it's probably worth switching to the real SDK instead of
+ * growing these hand-rolled regexes further.
+ *
+ * Speaking of regexes: yes, this parses the response JSON with regex instead of a real
+ * JSON parser. That's a deliberate trade-off, not an oversight - we only need two things
+ * out of a much bigger response (the first text block, and the token counts), and adding
+ * a JSON library as a dependency for that felt heavier than it's worth. If we ever need
+ * to pull more fields out of the response, switch to a real parser at that point.
+ */
 final class AnthropicHttpClient implements ClaudeMessagesClient {
 
     private static final String API_URL = "https://api.anthropic.com/v1/messages";
     private static final String ANTHROPIC_VERSION = "2023-06-01";
+
+    // Matches the first {"type":"text","text":"..."} block in the response. Claude's replies
+    // are a list of content blocks; for our use case (one short prompt, one short answer)
+    // there's only ever one, so we don't bother handling multiple blocks.
     private static final Pattern FIRST_TEXT_BLOCK =
             Pattern.compile("\"type\"\\s*:\\s*\"text\"\\s*,\\s*\"text\"\\s*:\\s*\"((?:\\\\.|[^\"\\\\])*)\"");
+
+    // input_tokens and output_tokens are matched independently (not as one combined pattern)
+    // because Anthropic's usage block can have other fields (like cache token counts)
+    // sitting between them - a single "match both in one shot" regex broke on that.
     private static final Pattern INPUT_TOKENS = Pattern.compile("\"input_tokens\"\\s*:\\s*(\\d+)");
     private static final Pattern OUTPUT_TOKENS = Pattern.compile("\"output_tokens\"\\s*:\\s*(\\d+)");
 
@@ -63,6 +84,8 @@ final class AnthropicHttpClient implements ClaudeMessagesClient {
         return matcher.find() ? Optional.of(JsonEscaping.unescape(matcher.group(1))) : Optional.empty();
     }
 
+    // Package-private (not private) so AnthropicHttpClientTest can call it directly with a
+    // handful of sample response bodies instead of needing a live API call to test parsing.
     static TokenUsage parseUsage(String responseJson) {
         return new TokenUsage(firstIntGroup(INPUT_TOKENS, responseJson), firstIntGroup(OUTPUT_TOKENS, responseJson));
     }

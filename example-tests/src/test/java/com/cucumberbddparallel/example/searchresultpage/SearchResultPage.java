@@ -11,9 +11,12 @@ import org.testng.Assert;
 import java.util.List;
 import java.util.stream.IntStream;
 
+/** Page object for the Google search results page - just the "is this URL in the first N results" check. */
 public class SearchResultPage extends BasePage {
 
     private static final Logger LOG = LoggerFactory.getLogger(SearchResultPage.class);
+    // Google renders each result's visible URL inside a <cite> tag - that's genuinely all
+    // we're matching against here, not the full result markup.
     private static final String RESULTS_URL_SELECTOR = "cite";
 
     @FindBy(css = RESULTS_URL_SELECTOR)
@@ -22,8 +25,12 @@ public class SearchResultPage extends BasePage {
     SearchResultPage() {
     }
 
+    /** True if {@code expectedUrl} shows up among the first {@code nbOfResultsToSearch} results. */
     void checkExpectedUrlInResults(String expectedUrl, int nbOfResultsToSearch) {
         wait.forPresenceOfElements(5, By.cssSelector(RESULTS_URL_SELECTOR), "Result url");
+        // Math.min guards against asking for more results than actually came back - without
+        // it, a search returning fewer results than expected would throw an
+        // IndexOutOfBoundsException instead of a clear assertion failure.
         int indexOfLink = IntStream.range(0, Math.min(this.results.size(), nbOfResultsToSearch))
                 .filter(index -> expectedUrl.equals(this.results.get(index).getText()))
                 .findFirst()

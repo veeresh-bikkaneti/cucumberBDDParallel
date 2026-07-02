@@ -1,14 +1,19 @@
 package com.cucumberbddparallel.example.homepage;
 
-
-
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
+/**
+ * Step definitions for Home_page.feature and the home-page part of Search.feature.
+ *
+ * This class is deliberately thin: every step just calls a method on {@link HomePage}. The
+ * step definitions describe "what happens in the Gherkin," the page object knows "how to
+ * actually do it on the page" - keeping that split means the same HomePage methods get
+ * reused by SearchTest without duplicating any Selenium code.
+ */
 public class HomePageSteps {
-
 
     private HomePage homePage;
 
