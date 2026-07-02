@@ -63,7 +63,7 @@ final class AnthropicHttpClient implements ClaudeMessagesClient {
         return matcher.find() ? Optional.of(JsonEscaping.unescape(matcher.group(1))) : Optional.empty();
     }
 
-    private static TokenUsage parseUsage(String responseJson) {
+    static TokenUsage parseUsage(String responseJson) {
         return new TokenUsage(firstIntGroup(INPUT_TOKENS, responseJson), firstIntGroup(OUTPUT_TOKENS, responseJson));
     }
 
