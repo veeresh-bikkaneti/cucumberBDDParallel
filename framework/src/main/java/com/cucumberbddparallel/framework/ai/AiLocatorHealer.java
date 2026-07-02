@@ -1,4 +1,4 @@
-package com.cucumberparallel.ai;
+package com.cucumberbddparallel.framework.ai;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
