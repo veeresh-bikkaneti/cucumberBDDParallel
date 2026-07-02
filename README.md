@@ -19,7 +19,7 @@ into two pieces:
 ## Running the example tests
 
 ```
-./mvnw clean verify -Pintegration-test -pl example-tests -am
+./mvnw clean verify -Pintegration-test -DskipTests -pl example-tests -am
 ```
 
 Browser selection: `-Dbrowser=firefox` (defaults to `chrome`).
@@ -36,7 +36,7 @@ present in the environment - never commit a key to source control:
 ```
 export ANTHROPIC_API_KEY=sk-ant-...
 export ANTHROPIC_MODEL=claude-sonnet-5   # optional, this is the default
-./mvnw clean verify -Pintegration-test -pl example-tests -am
+./mvnw clean verify -Pintegration-test -DskipTests -pl example-tests -am
 ```
 
 To force it off even with a key present: `-Dai.healing.enabled=false`.
@@ -45,8 +45,8 @@ Every healing call logs its token usage and dollar cost. Look for
 lines like:
 
 ```
-AI locator heal: element=searchInput model=claude-sonnet-5 in=1842 out=12 cost=$0.006126
-AI locator healing session total: $0.006126
+AI locator heal: element=searchInput model=claude-sonnet-5 in=1842 out=12 cost=$0.005706
+AI locator healing session total: $0.005706
 ```
 
 See `PLAYBOOK.md` for the pricing table, how CI surfaces this per
