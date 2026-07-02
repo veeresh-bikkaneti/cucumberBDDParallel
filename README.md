@@ -89,3 +89,8 @@ is a working reference for exactly this setup.
 behind them, the full AI cost model, CI internals, and how to extend
 the framework - written for someone who's going to build on this, not
 just run it.
+
+## Author
+
+Built by [Veeresh Bikkaneti](https://veeresh-bikkaneti.github.io/techtalkwith-veeresh/)
+at [RunTechCS](https://runtechcs.com).

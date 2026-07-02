@@ -7,6 +7,23 @@
     <artifactId>cucumberbddparallel-parent</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
+    <name>cucumberBDDParallel</name>
+    <description>A Cucumber + Selenium 4 + TestNG framework for browser BDD tests, with an opt-in AI self-healing locator.</description>
+    <url>https://github.com/veeresh-bikkaneti/cucumberBDDParallel</url>
+
+    <organization>
+        <name>RunTechCS</name>
+        <url>https://runtechcs.com</url>
+    </organization>
+
+    <developers>
+        <developer>
+            <name>Veeresh Bikkaneti</name>
+            <organization>RunTechCS</organization>
+            <organizationUrl>https://runtechcs.com</organizationUrl>
+            <url>https://veeresh-bikkaneti.github.io/techtalkwith-veeresh/</url>
+        </developer>
+    </developers>
 
     <modules>
         <module>framework</module>
