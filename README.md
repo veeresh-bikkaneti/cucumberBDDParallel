@@ -1,7 +1,12 @@
 # cucumberBDDParallel
 
 A Cucumber + Selenium 4 + TestNG framework for browser BDD tests, split
-into two pieces:
+into two pieces. I built this the way I wish more test frameworks were
+built: a small reusable core you can actually depend on, a real
+working example instead of a toy one, and locators that don't need a
+babysitter every time a page's markup shifts.
+
+The two pieces:
 
 - `framework/` - the reusable part: driver setup/teardown, explicit
   waits, a base page class, and an opt-in AI self-healing locator.

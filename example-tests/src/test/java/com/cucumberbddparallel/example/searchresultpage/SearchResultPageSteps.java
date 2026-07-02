@@ -1,8 +1,8 @@
 package com.cucumberbddparallel.example.searchresultpage;
 
-
 import io.cucumber.java.en.Then;
 
+/** Step definition for the one assertion Search.feature makes: a URL appears in the results. */
 public class SearchResultPageSteps {
 
     private SearchResultPage searchResultPage;
