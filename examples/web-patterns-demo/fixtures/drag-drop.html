@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Drag and drop demo</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; }
+    .lane { display: flex; gap: 2rem; }
+    .list { min-width: 180px; min-height: 200px; border: 2px dashed #888; padding: 0.5rem; border-radius: 8px; }
+    .card { background: #e8f4ff; border: 1px solid #6ab0ff; padding: 0.5rem 0.75rem; margin-bottom: 0.5rem; border-radius: 6px; cursor: grab; }
+    #drop-status { margin-top: 1rem; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <h1>Release checklist</h1>
+  <div class="lane">
+    <div id="todo" class="list" data-testid="todo-lane">
+      <div id="card-qa" class="card" draggable="true">QA sign-off</div>
+      <div id="card-docs" class="card" draggable="true">Update docs</div>
+    </div>
+    <div id="done" class="list" data-testid="done-lane"></div>
+  </div>
+  <p id="drop-status">Waiting for drop…</p>
+  <script>
+    const doneLane = document.getElementById('done');
+    const status = document.getElementById('drop-status');
+    document.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', card.id));
+    });
+    doneLane.addEventListener('dragover', e => e.preventDefault());
+    doneLane.addEventListener('drop', e => {
+      e.preventDefault();
+      const id = e.dataTransfer.getData('text/plain');
+      const el = document.getElementById(id);
+      if (el) {
+        doneLane.appendChild(el);
+        status.textContent = 'Dropped: ' + el.textContent;
+      }
+    });
+  </script>
+</body>
+</html>

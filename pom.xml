@@ -29,6 +29,7 @@
         <module>framework</module>
         <module>example-tests</module>
         <module>examples/ai-healing-demo</module>
+        <module>examples/web-patterns-demo</module>
     </modules>
 
     <properties>

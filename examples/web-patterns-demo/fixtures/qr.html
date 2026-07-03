@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>QR demo</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; text-align: center; }
+    img { border: 1px solid #ddd; padding: 0.5rem; }
+  </style>
+</head>
+<body>
+  <h1>Scan to verify build</h1>
+  <img id="qr-image" src="/qr.png" alt="QR code" data-testid="qr-image" width="200" height="200"/>
+  <p>Payload: <code id="qr-payload">BUILD-OK-42</code></p>
+</body>
+</html>
