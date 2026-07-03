@@ -30,7 +30,8 @@ jobs:
       - run: ./mvnw -B -pl examples/ai-healing-demo -am test -Dtest=MockAiHealingDemoTest
       - name: Demo summary
         if: always()
-        run: echo "AI healing mock demo: deterministic broken-locator + mock LLM test." >> "$GITHUB_STEP_SUMMARY"
+        run: |
+          echo "AI healing mock demo — deterministic broken-locator + mock LLM test." >> "$GITHUB_STEP_SUMMARY"
 
   e2e-no-ai:
     runs-on: ubuntu-latest
@@ -46,7 +47,7 @@ jobs:
       - name: Note AI status in job summary
         if: always()
         run: |
-          echo "AI locator healing: off, no ANTHROPIC_API_KEY was set for this job." >> "$GITHUB_STEP_SUMMARY"
+          echo "AI locator healing off — no ANTHROPIC_API_KEY was set for this job." >> "$GITHUB_STEP_SUMMARY"
 
   e2e-with-ai:
     runs-on: ubuntu-latest
