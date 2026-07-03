@@ -90,4 +90,17 @@ class AiConfigTest {
                 "AI_HEALING_BASE_URL", "https://my-gateway.example/v1");
         assertEquals("https://my-gateway.example/v1", AiConfig.baseUrl(env::get));
     }
+
+    @Test
+    void systemPropertyEnablesOpenAiProviderForDemos() {
+        try {
+            System.setProperty("AI_HEALING_PROVIDER", "openai");
+            System.setProperty("AI_HEALING_API_KEY", "demo-key");
+            assertTrue(AiConfig.isHealingEnabled());
+            assertEquals(AiProvider.OPENAI, AiConfig.provider());
+        } finally {
+            System.clearProperty("AI_HEALING_PROVIDER");
+            System.clearProperty("AI_HEALING_API_KEY");
+        }
+    }
 }

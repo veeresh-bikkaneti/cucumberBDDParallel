@@ -31,7 +31,7 @@ public final class AiConfig {
     }
 
     public static boolean isHealingEnabled() {
-        return isHealingEnabled(System::getenv, System::getProperty);
+        return isHealingEnabled(settings(), System::getProperty);
     }
 
     static boolean isHealingEnabled(Function<String, String> env, Function<String, String> systemProperty) {
@@ -42,7 +42,7 @@ public final class AiConfig {
     }
 
     public static AiProvider provider() {
-        return provider(System::getenv);
+        return provider(settings());
     }
 
     static AiProvider provider(Function<String, String> env) {
@@ -50,7 +50,7 @@ public final class AiConfig {
     }
 
     public static String model() {
-        return model(System::getenv);
+        return model(settings());
     }
 
     static String model(Function<String, String> env) {
@@ -67,7 +67,7 @@ public final class AiConfig {
     }
 
     public static String apiKey() {
-        return apiKey(System::getenv);
+        return apiKey(settings());
     }
 
     static String apiKey(Function<String, String> env) {
@@ -84,7 +84,12 @@ public final class AiConfig {
     }
 
     public static String baseUrl() {
-        return baseUrl(System::getenv);
+        return baseUrl(settings());
+    }
+
+    /** Environment variable first, then JVM system property (same key name). */
+    static Function<String, String> settings() {
+        return key -> firstNonBlank(System.getenv(key), System.getProperty(key));
     }
 
     static String baseUrl(Function<String, String> env) {

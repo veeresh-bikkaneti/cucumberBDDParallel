@@ -76,3 +76,22 @@ export AI_HEALING_MODEL=your-model-id
 
 Prefer setting `AI_HEALING_PROVIDER` explicitly so CI and teammates know
 which backend you intended.
+
+## Run the demo
+
+Deterministic mock (CI-safe, no cloud key):
+
+```bash
+./mvnw -pl examples/ai-healing-demo -am test
+```
+
+Live provider (Anthropic, OpenAI, or Ollama):
+
+```bash
+export AI_HEALING_DEMO_LIVE=true
+# plus provider vars — see examples/ai-healing-demo/README.md
+./mvnw -pl examples/ai-healing-demo -am test -Plive-ai-demo
+```
+
+Scripts: `scripts/run-ai-demo-mock.sh`, `run-ai-demo-anthropic.sh`,
+`run-ai-demo-openai.sh`, `run-ai-demo-ollama.sh`.

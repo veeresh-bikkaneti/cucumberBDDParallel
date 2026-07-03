@@ -82,6 +82,14 @@ Every healing call logs token usage and cost (when the model is in the
 pricing table). See `docs/AI_HEALING.md` and `PLAYBOOK.md` for full
 env var reference, CI notes, and cost tracking.
 
+**Runnable demo (no API key required for CI):**
+
+```bash
+./mvnw -pl examples/ai-healing-demo -am test
+```
+
+See `examples/ai-healing-demo/README.md` for mock vs live provider runs.
+
 ```mermaid
 flowchart TD
     A[Step definition calls a page object method] --> B[Selenium looks up the @FindBy element]
