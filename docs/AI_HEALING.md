@@ -74,6 +74,9 @@ export AI_HEALING_MODEL=your-model-id
 3. Else `OLLAMA_HOST` or `AI_HEALING_OLLAMA=true` → Ollama
 4. Else healing stays **off**
 
+If multiple credential sets are present (e.g. both `ANTHROPIC_API_KEY` and
+`OPENAI_API_KEY`), Anthropic wins unless you set `AI_HEALING_PROVIDER` explicitly.
+
 Prefer setting `AI_HEALING_PROVIDER` explicitly so CI and teammates know
 which backend you intended.
 

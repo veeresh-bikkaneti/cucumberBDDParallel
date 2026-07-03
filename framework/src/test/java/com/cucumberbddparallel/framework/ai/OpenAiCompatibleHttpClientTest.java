@@ -4,8 +4,22 @@ import com.cucumberbddparallel.framework.ai.cost.TokenUsage;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class OpenAiCompatibleHttpClientTest {
+
+    @Test
+    void extractsSelectorFromMessageContent() {
+        String body = """
+                {
+                  "choices":[{"message":{"role":"assistant","content":"```css\\n#logo\\n```"}}],
+                  "usage":{"prompt_tokens":1,"completion_tokens":2}
+                }
+                """;
+
+        assertTrue(OpenAiCompatibleHttpClient.messageContent(body).isPresent());
+        assertEquals("```css\n#logo\n```", OpenAiCompatibleHttpClient.messageContent(body).orElseThrow());
+    }
 
     @Test
     void parsesMessageContentAndUsage() {

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AiConfigTest {
@@ -59,7 +60,21 @@ class AiConfigTest {
 
     @Test
     void anthropicModelDefaultsToSonnetWhenUnset() {
-        assertEquals("claude-sonnet-5", AiConfig.model(key -> null));
+        Map<String, String> env = Map.of("ANTHROPIC_API_KEY", "sk-ant-test");
+        assertEquals("claude-sonnet-5", AiConfig.model(env::get));
+    }
+
+    @Test
+    void modelThrowsWhenHealingNotConfigured() {
+        assertThrows(IllegalStateException.class, () -> AiConfig.model(key -> null));
+    }
+
+    @Test
+    void anthropicWinsWhenBothAnthropicAndOpenAiKeysPresent() {
+        Map<String, String> env = Map.of(
+                "ANTHROPIC_API_KEY", "sk-ant-test",
+                "OPENAI_API_KEY", "sk-openai-test");
+        assertEquals(AiProvider.ANTHROPIC, AiConfig.provider(env::get));
     }
 
     @Test

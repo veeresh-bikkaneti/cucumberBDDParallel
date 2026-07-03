@@ -43,10 +43,8 @@ final class OpenAiCompatibleHttpClient implements LlmMessagesClient {
                 .header("content-type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody));
 
-        String apiKey = AiConfig.apiKey();
-        if (apiKey != null && !apiKey.isBlank() && !"ollama".equals(apiKey)) {
-            builder.header("Authorization", "Bearer " + apiKey);
-        }
+        AiConfig.bearerToken()
+                .ifPresent(token -> builder.header("Authorization", "Bearer " + token));
 
         String responseBody;
         try {
@@ -60,12 +58,12 @@ final class OpenAiCompatibleHttpClient implements LlmMessagesClient {
             throw new IllegalStateException("Failed to call LLM API for locator healing at " + apiUrl, e);
         }
 
-        String text = firstMessageContent(responseBody)
+        String text = messageContent(responseBody)
                 .orElseThrow(() -> new IllegalStateException("LLM returned no selector suggestion"));
         return new LlmResponse(text, parseUsage(responseBody));
     }
 
-    private static Optional<String> firstMessageContent(String responseJson) {
+    static Optional<String> messageContent(String responseJson) {
         Matcher matcher = MESSAGE_CONTENT.matcher(responseJson);
         return matcher.find() ? Optional.of(JsonEscaping.unescape(matcher.group(1))) : Optional.empty();
     }

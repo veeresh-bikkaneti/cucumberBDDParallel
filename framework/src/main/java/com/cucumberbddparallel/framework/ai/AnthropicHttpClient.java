@@ -27,7 +27,6 @@ import java.util.regex.Pattern;
  */
 final class AnthropicHttpClient implements LlmMessagesClient {
 
-    private static final String API_URL = "https://api.anthropic.com/v1/messages";
     private static final String ANTHROPIC_VERSION = "2023-06-01";
 
     // Matches the first {"type":"text","text":"..."} block in the response. Claude's replies
@@ -55,7 +54,8 @@ final class AnthropicHttpClient implements LlmMessagesClient {
                 + "\"messages\":[{\"role\":\"user\",\"content\":\"" + JsonEscaping.escape(userMessage) + "\"}]"
                 + "}";
 
-        HttpRequest request = HttpRequest.newBuilder(URI.create(API_URL))
+        String apiUrl = AiConfig.baseUrl() + "/messages";
+        HttpRequest request = HttpRequest.newBuilder(URI.create(apiUrl))
                 .header("x-api-key", AiConfig.apiKey())
                 .header("anthropic-version", ANTHROPIC_VERSION)
                 .header("content-type", "application/json")
