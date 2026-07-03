@@ -27,7 +27,7 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
-      - run: ./mvnw -B -pl examples/ai-healing-demo -am test -Dtest=MockAiHealingDemoTest
+      - run: ./mvnw -B -pl examples/ai-healing-demo -am test -Dtest=MockAiHealingDemoTest -Dsurefire.failIfNoSpecifiedTests=false
       - name: Demo summary
         if: always()
         run: |
