@@ -7,10 +7,10 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 /**
- * The actual "ask Claude for a new selector" logic, kept deliberately small.
+ * The actual "ask an LLM for a new selector" logic, kept deliberately small.
  *
  * This class is just the orchestrator - it doesn't know how to talk HTTP
- * ({@link AnthropicHttpClient} does that), how to escape JSON ({@link JsonEscaping}),
+ * ({@link LlmClientFactory} picks the provider client), how to escape JSON ({@link JsonEscaping}),
  * or how to pull a selector out of a chat reply ({@link SelectorResponseParser}). It
  * used to be one big class that did all of that itself, which made it painful to test
  * (you'd need a live network call just to check that a CSS selector gets trimmed
@@ -22,8 +22,6 @@ final class AiLocatorHealer {
     // Google's homepage HTML alone is well past this, so we're always truncating in
     // practice - that's fine, the search bar and logo we care about are near the top.
     private static final int MAX_PAGE_SOURCE_CHARS = 12_000;
-    private static final ClaudeMessagesClient CLIENT = new AnthropicHttpClient();
-
     private AiLocatorHealer() {
     }
 
@@ -50,7 +48,7 @@ final class AiLocatorHealer {
                 + "that matches the intended element, wrapped in a ``` code fence and nothing else.";
         String userMessage = "Element: " + elementDescription + "\n\nPage HTML:\n" + truncate(pageSource);
 
-        ClaudeMessagesClient.ClaudeResponse response = CLIENT.send(system, userMessage);
+        LlmMessagesClient.LlmResponse response = LlmClientFactory.create().send(system, userMessage);
         // Log the cost even if the suggested selector turns out to be wrong - you paid for
         // the API call either way, and knowing that helps you notice if healing is
         // firing way more often than expected (usually a sign your locators are stale).

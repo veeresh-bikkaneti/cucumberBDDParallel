@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
  * a JSON library as a dependency for that felt heavier than it's worth. If we ever need
  * to pull more fields out of the response, switch to a real parser at that point.
  */
-final class AnthropicHttpClient implements ClaudeMessagesClient {
+final class AnthropicHttpClient implements LlmMessagesClient {
 
     private static final String API_URL = "https://api.anthropic.com/v1/messages";
     private static final String ANTHROPIC_VERSION = "2023-06-01";
@@ -47,7 +47,7 @@ final class AnthropicHttpClient implements ClaudeMessagesClient {
             .build();
 
     @Override
-    public ClaudeResponse send(String system, String userMessage) {
+    public LlmResponse send(String system, String userMessage) {
         String requestBody = "{"
                 + "\"model\":\"" + JsonEscaping.escape(AiConfig.model()) + "\","
                 + "\"max_tokens\":256,"
@@ -56,7 +56,7 @@ final class AnthropicHttpClient implements ClaudeMessagesClient {
                 + "}";
 
         HttpRequest request = HttpRequest.newBuilder(URI.create(API_URL))
-                .header("x-api-key", System.getenv("ANTHROPIC_API_KEY"))
+                .header("x-api-key", AiConfig.apiKey())
                 .header("anthropic-version", ANTHROPIC_VERSION)
                 .header("content-type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
@@ -76,7 +76,7 @@ final class AnthropicHttpClient implements ClaudeMessagesClient {
 
         String text = firstTextBlock(responseBody)
                 .orElseThrow(() -> new IllegalStateException("Claude returned no selector suggestion"));
-        return new ClaudeResponse(text, parseUsage(responseBody));
+        return new LlmResponse(text, parseUsage(responseBody));
     }
 
     private static Optional<String> firstTextBlock(String responseJson) {
