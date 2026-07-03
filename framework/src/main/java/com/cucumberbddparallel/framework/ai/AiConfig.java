@@ -1,50 +1,97 @@
 package com.cucumberbddparallel.framework.ai;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * Turns AI self-healing on or off, and picks which model to use.
+ * Entry point for AI locator-healing configuration. Resolves settings from environment
+ * variables and JVM system properties via {@link AiHealingSettings}.
  *
- * The rule is simple: if you don't set an ANTHROPIC_API_KEY, nothing AI-related
- * ever runs. No key means no network calls, no cost, no surprises. That's on
- * purpose - a test framework shouldn't silently start calling an external API
- * just because a class is on the classpath.
+ * <p>Primary variables: {@code AI_HEALING_PROVIDER}, {@code AI_HEALING_MODEL},
+ * {@code AI_HEALING_API_KEY}, {@code AI_HEALING_BASE_URL}.
  *
- * Nothing here is hardcoded. Both the key and the model name come from the
- * environment, so please don't "helpfully" paste an API key into this file.
+ * <p>Legacy: {@code ANTHROPIC_API_KEY}, {@code ANTHROPIC_MODEL}, {@code OPENAI_API_KEY},
+ * {@code OLLAMA_HOST}. See {@code docs/AI_HEALING.md}.
  */
 public final class AiConfig {
-
-    // Sonnet is the default because healing a locator is a small, well-defined task
-    // (read some HTML, return one CSS selector) - it doesn't need Opus-level reasoning,
-    // and it's a fraction of the cost. See PLAYBOOK.md for the full reasoning.
-    private static final String DEFAULT_MODEL = "claude-sonnet-5";
 
     private AiConfig() {
     }
 
-    /** True only when an API key is present AND nobody has explicitly opted out. */
     public static boolean isHealingEnabled() {
-        return isHealingEnabled(System::getenv, System::getProperty);
+        return isHealingEnabled(settings(), System::getProperty);
     }
 
-    // Package-private overload that takes the env/property lookups as parameters instead
-    // of calling System.getenv()/System.getProperty() directly. That's what makes this
-    // testable without needing to actually set real environment variables in a JUnit run -
-    // see AiConfigTest for what that looks like in practice.
     static boolean isHealingEnabled(Function<String, String> env, Function<String, String> systemProperty) {
-        boolean hasApiKey = env.apply("ANTHROPIC_API_KEY") != null;
-        boolean optedOut = "false".equalsIgnoreCase(systemProperty.apply("ai.healing.enabled"));
-        return hasApiKey && !optedOut;
+        return AiHealingSettings.resolve(env, systemProperty).isPresent();
     }
 
-    /** Which Claude model to call, defaulting to Sonnet unless ANTHROPIC_MODEL says otherwise. */
+    public static AiProvider provider() {
+        return requireSettings().provider();
+    }
+
+    static AiProvider provider(Function<String, String> env) {
+        return AiHealingSettings.resolve(env, key -> null)
+                .orElseThrow(() -> new IllegalStateException(
+                        "AI healing is not configured — set AI_HEALING_PROVIDER and credentials"))
+                .provider();
+    }
+
     public static String model() {
-        return model(System::getenv);
+        return requireSettings().model();
     }
 
     static String model(Function<String, String> env) {
-        String override = env.apply("ANTHROPIC_MODEL");
-        return override == null || override.isBlank() ? DEFAULT_MODEL : override;
+        return AiHealingSettings.resolve(env, key -> null)
+                .map(AiHealingSettings::model)
+                .orElseThrow(() -> new IllegalStateException(
+                        "AI healing is not configured — cannot resolve model"));
+    }
+
+    public static String apiKey() {
+        return requireSettings().apiKey();
+    }
+
+    static String apiKey(Function<String, String> env) {
+        return AiHealingSettings.resolve(env, key -> null)
+                .map(AiHealingSettings::apiKey)
+                .orElseThrow(() -> new IllegalStateException(
+                        "AI healing is not configured — cannot resolve API key"));
+    }
+
+    public static String baseUrl() {
+        return requireSettings().baseUrl();
+    }
+
+    static String baseUrl(Function<String, String> env) {
+        return AiHealingSettings.resolve(env, key -> null)
+                .map(AiHealingSettings::baseUrl)
+                .orElseThrow(() -> new IllegalStateException(
+                        "AI healing is not configured — cannot resolve base URL"));
+    }
+
+    static Optional<String> bearerToken() {
+        return AiHealingSettings.resolve(settings(), System::getProperty).flatMap(AiHealingSettings::bearerToken);
+    }
+
+    /** Environment variable first, then JVM system property (same key name). */
+    static Function<String, String> settings() {
+        return key -> firstNonBlank(System.getenv(key), System.getProperty(key));
+    }
+
+    private static AiHealingSettings requireSettings() {
+        return AiHealingSettings.resolve(settings(), System::getProperty)
+                .orElseThrow(() -> new IllegalStateException(
+                        "AI healing is not enabled — set provider credentials or AI_HEALING_PROVIDER"));
+    }
+
+    private static String firstNonBlank(String a, String b) {
+        if (a != null && !a.isBlank()) {
+            return a;
+        }
+        if (b != null && !b.isBlank()) {
+            return b;
+        }
+        return null;
     }
 }

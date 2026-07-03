@@ -32,30 +32,63 @@ Browser selection: `-Dbrowser=firefox` (defaults to `chrome`).
 ## AI self-healing locators
 
 When a page's `@FindBy` locator can no longer find its element (e.g.
-after a markup change), the framework can ask Claude for a
-replacement CSS selector and retry once before failing the step.
+after a markup change), the framework can ask an LLM for a replacement
+CSS selector and retry once before failing the step.
 
-This is **off by default** and only turns on when an API key is
-present in the environment - never commit a key to source control:
+**You pick the route** — Anthropic BYOK, OpenAI-compatible BYOK (OpenAI,
+Azure, gateways), or **local Ollama**. Nothing is locked to one vendor.
+
+This is **off by default** until you configure a provider. Never commit
+API keys to source control.
+
+### Quick setup (pick one)
+
+**Anthropic (BYOK, legacy env vars still work):**
 
 ```
-export ANTHROPIC_API_KEY=sk-ant-...
-export ANTHROPIC_MODEL=claude-sonnet-5   # optional, this is the default
+export AI_HEALING_PROVIDER=anthropic
+export AI_HEALING_API_KEY=sk-ant-...
+export AI_HEALING_MODEL=claude-sonnet-5   # optional
+```
+
+**OpenAI or any OpenAI-compatible cloud API (BYOK):**
+
+```
+export AI_HEALING_PROVIDER=openai
+export AI_HEALING_API_KEY=sk-...
+export AI_HEALING_MODEL=gpt-4o-mini      # optional
+# Optional custom gateway:
+# export AI_HEALING_BASE_URL=https://my-gateway.example/v1
+```
+
+**Local Ollama (no cloud key):**
+
+```
+export AI_HEALING_PROVIDER=ollama
+export AI_HEALING_MODEL=llama3.2         # must be pulled in Ollama first
+# Optional if Ollama is not on localhost:11434
+# export OLLAMA_HOST=http://127.0.0.1:11434
+```
+
+Then run tests as usual:
+
+```
 ./mvnw clean verify -Pintegration-test -DskipTests -pl example-tests -am
 ```
 
-To force it off even with a key present: `-Dai.healing.enabled=false`.
+To force healing off even when configured: `-Dai.healing.enabled=false`.
 
-Every healing call logs its token usage and dollar cost. Look for
-lines like:
+Every healing call logs token usage and cost (when the model is in the
+pricing table). See `docs/AI_HEALING.md` and `PLAYBOOK.md` for full
+env var reference, CI notes, and cost tracking.
 
+**Runnable demo (no API key required for CI):**
+
+```bash
+./mvnw -pl examples/ai-healing-demo -am test
 ```
-AI locator heal: element=searchInput model=claude-sonnet-5 in=1842 out=12 cost=$0.005706
-AI locator healing session total: $0.005706
-```
 
-See `PLAYBOOK.md` for the pricing table, how CI surfaces this per
-run, and how to change the default model.
+See `examples/ai-healing-demo/README.md` for mock vs live provider runs.
 
 ```mermaid
 flowchart TD
@@ -63,8 +96,8 @@ flowchart TD
     B --> C{Element found?}
     C -->|Yes| D[Test continues]
     C -->|No, healing off| E[Test fails: NoSuchElementException]
-    C -->|No, healing on| F[Send page HTML to Claude]
-    F --> G[Claude suggests a CSS selector]
+    C -->|No, healing on| F[Send page HTML to configured LLM]
+    F --> G[LLM suggests a CSS selector]
     G --> H{New selector finds it?}
     H -->|Yes| D
     H -->|No| E

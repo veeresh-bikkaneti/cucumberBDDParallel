@@ -28,6 +28,7 @@
     <modules>
         <module>framework</module>
         <module>example-tests</module>
+        <module>examples/ai-healing-demo</module>
     </modules>
 
     <properties>

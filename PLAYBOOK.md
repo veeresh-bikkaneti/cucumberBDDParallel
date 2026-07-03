@@ -118,12 +118,13 @@ your markup actually changes, not the per-call price.
 
 ### Turning it off entirely
 
-No `ANTHROPIC_API_KEY` in the environment means healing never
+No provider credentials in the environment means healing never
 activates - `AiConfig.isHealingEnabled()` returns `false` and
-`BasePage` uses Selenium's plain `DefaultElementLocatorFactory`. If a
-key is present but you want to force it off anyway (e.g. a CI job
-that has the secret available for other jobs but shouldn't use it
-here), pass `-Dai.healing.enabled=false`.
+`BasePage` uses Selenium's plain `DefaultElementLocatorFactory`.
+Configure `AI_HEALING_PROVIDER` plus BYOK keys, or `AI_HEALING_PROVIDER=ollama`
+for local Ollama. See `docs/AI_HEALING.md`. If credentials are present
+but you want to force healing off (e.g. a CI job that has secrets for
+other jobs), pass `-Dai.healing.enabled=false`.
 
 ## CI
 
@@ -134,7 +135,7 @@ flowchart LR
     A[push or pull_request] --> B[unit-tests]
     B --> C[e2e-no-ai]
     B --> D[e2e-with-ai]
-    D --> E{ANTHROPIC_API_KEY secret set?}
+    D --> E{AI healing credentials secret set?}
     E -->|No| F[skip, note in job summary]
     E -->|Yes| G[run with healing, log cost to job summary]
 ```
@@ -143,10 +144,10 @@ flowchart LR
   network, fast. Gates the other two jobs.
 - **e2e-no-ai** - the example suite against google.com with no API
   key present. Proves the framework works standalone.
-- **e2e-with-ai** - same suite, with `ANTHROPIC_API_KEY` from a repo
-  secret. Skips itself gracefully (rather than failing) when the
-  secret isn't configured, so forks without the secret don't get a
-  red X for something outside their control.
+- **e2e-with-ai** - same suite, with AI healing credentials from a repo
+  secret (`ANTHROPIC_API_KEY` or unified `AI_HEALING_*` vars). Skips
+  itself gracefully when the secret isn't configured, so forks without
+  the secret don't get a red X for something outside their control.
 
 ## How a healing call actually works end to end
 
@@ -156,8 +157,8 @@ sequenceDiagram
     participant Page as Page object
     participant Locator as SelfHealingElementLocator
     participant Healer as AiLocatorHealer
-    participant Client as ClaudeMessagesClient
-    participant API as Claude API
+    participant Client as LlmMessagesClient
+    participant API as Configured LLM API
     participant Cost as CostLogger
 
     Step->>Page: call page method
@@ -168,7 +169,7 @@ sequenceDiagram
     Healer->>Client: send(system prompt, page HTML + description)
     Client->>API: POST /v1/messages
     API-->>Client: selector text + token usage
-    Client-->>Healer: ClaudeResponse
+    Client-->>Healer: LlmResponse
     Healer->>Cost: logHealCall(element, model, usage)
     Healer->>Healer: parse selector, retry findElement
     Healer-->>Page: WebElement
