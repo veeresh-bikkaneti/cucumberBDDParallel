@@ -90,6 +90,20 @@ env var reference, CI notes, and cost tracking.
 
 See `examples/ai-healing-demo/README.md` for mock vs live provider runs.
 
+**Web patterns demo (tables, drag-drop, upload/download, PDF, QR):**
+
+```bash
+./mvnw -pl examples/web-patterns-demo -am test
+```
+
+**Docker (all example modules headlessly):**
+
+```bash
+docker compose build && docker compose run --rm cucumber-examples
+```
+
+MCP agent playbook: `docs/MCP_PLAYBOOK.md`.
+
 ```mermaid
 flowchart TD
     A[Step definition calls a page object method] --> B[Selenium looks up the @FindBy element]

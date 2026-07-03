@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Upload demo</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; }
+    #result { margin-top: 1rem; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <h1>Attach evidence</h1>
+  <form id="upload-form">
+    <input id="file-input" type="file" name="file" data-testid="file-input"/>
+    <button type="submit">Upload</button>
+  </form>
+  <p id="result">No file uploaded yet.</p>
+  <script>
+    document.getElementById('upload-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const input = document.getElementById('file-input');
+      if (!input.files.length) return;
+      const body = new FormData();
+      body.append('file', input.files[0]);
+      const response = await fetch('/upload', { method: 'POST', body });
+      const text = await response.text();
+      document.getElementById('result').textContent = text;
+    });
+  </script>
+</body>
+</html>

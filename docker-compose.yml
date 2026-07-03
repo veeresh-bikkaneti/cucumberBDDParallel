@@ -1,0 +1,33 @@
+services:
+  cucumber-examples:
+    build: .
+    image: cucumberbddparallel-examples:latest
+    shm_size: "2gb"
+    environment:
+      - CHROME_BIN=/usr/bin/google-chrome
+      - TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata
+    command: >
+      ./mvnw -B
+      -pl examples/web-patterns-demo,examples/ai-healing-demo
+      -am test
+      -Dsurefire.failIfNoSpecifiedTests=false
+
+  cucumber-examples-ocr:
+    profiles: ["ocr"]
+    build: .
+    image: cucumberbddparallel-examples:latest
+    shm_size: "2gb"
+    environment:
+      - CHROME_BIN=/usr/bin/google-chrome
+      - TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata
+    command: >
+      ./mvnw -B -pl examples/web-patterns-demo -am test -Pocr-demo
+      -Dtest=OcrValidationTest -Dsurefire.failIfNoSpecifiedTests=false
+
+  cucumber-integration:
+    profiles: ["integration"]
+    build: .
+    image: cucumberbddparallel-examples:latest
+    shm_size: "2gb"
+    command: >
+      ./mvnw -B clean verify -Pintegration-test -DskipTests -pl example-tests -am

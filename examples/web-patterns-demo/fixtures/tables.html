@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Tables demo</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; }
+    table { border-collapse: collapse; width: 100%; max-width: 640px; }
+    th, td { border: 1px solid #ccc; padding: 0.5rem 0.75rem; text-align: left; }
+    th { background: #f4f4f4; }
+  </style>
+</head>
+<body>
+  <h1>Order grid</h1>
+  <table id="orders" data-testid="orders-table">
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>Customer</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>ORD-1001</td><td>Alice</td><td>Shipped</td></tr>
+      <tr><td>ORD-1002</td><td>Bob</td><td>Pending</td></tr>
+      <tr><td>ORD-1003</td><td>Carol</td><td>Delivered</td></tr>
+    </tbody>
+  </table>
+</body>
+</html>
