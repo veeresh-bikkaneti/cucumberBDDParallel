@@ -1,0 +1,117 @@
+<!--
+Original Mermaid source:
+# file: PLAYBOOK.md
+# section: ## How a healing call actually works end to end
+# type: sequenceDiagram
+sequenceDiagram
+    participant Step as Step definition
+    participant Page as Page object
+    participant Locator as SelfHealingElementLocator
+    participant Healer as AiLocatorHealer
+    participant Client as LlmMessagesClient
+    participant API as Configured LLM API
+    participant Cost as CostLogger
+
+    Step->>Page: call page method
+    Page->>Locator: findElement()
+    Locator->>Locator: try the default lookup
+    Locator- ->>Locator: NoSuchElementException
+    Locator->>Healer: heal(driver, field name, exception)
+    Healer->>Client: send(system prompt, page HTML + description)
+    Client->>API: POST /v1/messages
+    API- ->>Client: selector text + token usage
+    Client- ->>Healer: LlmResponse
+    Healer->>Cost: logHealCall(element, model, usage)
+    Healer->>Healer: parse selector, retry findElement
+    Healer- ->>Page: WebElement
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 710" role="img">
+<title>How a healing call works end to end</title>
+<style>
+text{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.node{animation:node-in .6s cubic-bezier(.22,.61,.36,1) both}
+@keyframes node-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.edge{fill:none;stroke:#64748b;stroke-width:1.8;stroke-dasharray:7 5;animation:dash-flow 2.6s linear infinite}
+.edge.reply{stroke-dasharray:2 5}
+.edge-head{fill:#64748b;stroke:none}
+@keyframes dash-flow{to{stroke-dashoffset:-24}}
+.lifeline{stroke:#a8a29e;stroke-width:1.2;stroke-dasharray:5 5;opacity:.55}
+.body{stroke-width:1.8}
+.r-client .body{fill:#ecfeff;stroke:#0891b2}.r-client text{fill:#164e63}
+.r-service .body{fill:#ecfdf5;stroke:#059669}.r-service text{fill:#064e3b}
+.r-data .body{fill:#f5f3ff;stroke:#7c3aed}.r-data text{fill:#4c1d95}
+.r-cloud .body{fill:#fffbeb;stroke:#d97706}.r-cloud text{fill:#78350f}
+.r-security .body{fill:#fff1f2;stroke:#e11d48}.r-security text{fill:#881337}
+.r-neutral .body{fill:#fafaf9;stroke:#a8a29e}.r-neutral text{fill:#1c1917}
+.subgraph{fill:none;stroke:#a8a29e;stroke-width:1.5;stroke-dasharray:8 5}
+.subgraph-title{fill:#57534e;font-size:11px}
+.pill rect{fill:#ffffff;stroke:#a8a29e;stroke-width:1.2}
+.pill text{fill:#1c1917;font-size:11px}
+.pill.note rect{fill:#fffbeb;stroke:#d97706}
+.pill.note text{fill:#78350f}
+@media (prefers-reduced-motion:reduce){.node,.edge{animation:none!important}}
+@media (prefers-color-scheme:dark){
+.edge{stroke:#94a3b8}.edge-head{fill:#94a3b8}
+.lifeline{stroke:#475569}
+.subgraph{stroke:#64748b}.subgraph-title{fill:#94a3b8}
+.r-client .body{fill:#083344;stroke:#22d3ee}.r-client text{fill:#a5f3fc}
+.r-service .body{fill:#022c22;stroke:#34d399}.r-service text{fill:#a7f3d0}
+.r-data .body{fill:#2e1065;stroke:#a78bfa}.r-data text{fill:#ddd6fe}
+.r-cloud .body{fill:#451a03;stroke:#fbbf24}.r-cloud text{fill:#fde68a}
+.r-security .body{fill:#4c0519;stroke:#fb7185}.r-security text{fill:#fecdd3}
+.r-neutral .body{fill:#1e293b;stroke:#64748b}.r-neutral text{fill:#e2e8f0}
+.pill rect{fill:#1e293b;stroke:#475569}.pill text{fill:#e2e8f0}
+.pill.note rect{fill:#451a03;stroke:#fbbf24}.pill.note text{fill:#fde68a}
+}
+</style>
+<g class="node r-client" style="animation-delay:0.05s"><rect class="body" x="30.0" y="20" width="140" height="56" rx="8"/><text x="100.0" y="51.9" text-anchor="middle" font-size="11">Step definition</text></g>
+<g class="node r-neutral" style="animation-delay:0.12s"><rect class="body" x="190.0" y="20" width="140" height="56" rx="8"/><text x="260.0" y="51.9" text-anchor="middle" font-size="11">Page object</text></g>
+<g class="node r-service" style="animation-delay:0.19s"><rect class="body" x="350.0" y="20" width="140" height="56" rx="8"/><text x="420.0" y="44.4" text-anchor="middle" font-size="11">SelfHealing</text><text x="420.0" y="59.4" text-anchor="middle" font-size="11">ElementLocator</text></g>
+<g class="node r-data" style="animation-delay:0.26s"><rect class="body" x="510.0" y="20" width="140" height="56" rx="8"/><text x="580.0" y="51.9" text-anchor="middle" font-size="11">AiLocatorHealer</text></g>
+<g class="node r-client" style="animation-delay:0.33s"><rect class="body" x="670.0" y="20" width="140" height="56" rx="8"/><text x="740.0" y="51.9" text-anchor="middle" font-size="11">LlmMessagesClient</text></g>
+<g class="node r-cloud" style="animation-delay:0.40s"><rect class="body" x="830.0" y="20" width="140" height="56" rx="8"/><text x="900.0" y="51.9" text-anchor="middle" font-size="11">Configured LLM API</text></g>
+<g class="node r-neutral" style="animation-delay:0.47s"><rect class="body" x="990.0" y="20" width="140" height="56" rx="8"/><text x="1060.0" y="51.9" text-anchor="middle" font-size="11">CostLogger</text></g>
+<line class="lifeline" x1="100" y1="76" x2="100" y2="690"/>
+<line class="lifeline" x1="260" y1="76" x2="260" y2="690"/>
+<line class="lifeline" x1="420" y1="76" x2="420" y2="690"/>
+<line class="lifeline" x1="580" y1="76" x2="580" y2="690"/>
+<line class="lifeline" x1="740" y1="76" x2="740" y2="690"/>
+<line class="lifeline" x1="900" y1="76" x2="900" y2="690"/>
+<line class="lifeline" x1="1060" y1="76" x2="1060" y2="690"/>
+<path class="edge" d="M 170.0 130.0 L 190.0 130.0"/>
+<polygon class="edge-head" points="190.0,130.0 180.0,134.6 180.0,125.4"/>
+<g class="pill node" style="animation-delay:0.68s"><rect x="116.4" y="103.0" width="127.2" height="22" rx="11"/><text x="180.0" y="118.0" text-anchor="middle" font-size="11">call page method</text></g>
+<path class="edge" d="M 330.0 174.0 L 350.0 174.0"/>
+<polygon class="edge-head" points="350.0,174.0 340.0,178.6 340.0,169.4"/>
+<g class="pill node" style="animation-delay:0.68s"><rect x="286.4" y="147.0" width="107.1" height="22" rx="11"/><text x="340.0" y="162.0" text-anchor="middle" font-size="11">findElement()</text></g>
+<path class="edge" d="M 420 218 L 456 218 L 456 246 L 420 246"/>
+<polygon class="edge-head" points="420.0,246.0 430.0,241.4 430.0,250.6"/>
+<g class="pill node" style="animation-delay:0.68s"><rect x="456.3" y="221.0" width="167.4" height="22" rx="11"/><text x="540.0" y="236.0" text-anchor="middle" font-size="11">try the default lookup</text></g>
+<path class="edge reply" d="M 420 274 L 456 274 L 456 302 L 420 302"/>
+<polygon class="edge-head" points="420.0,302.0 430.0,297.4 430.0,306.6"/>
+<g class="pill node" style="animation-delay:0.68s"><rect x="456.3" y="277.0" width="167.4" height="22" rx="11"/><text x="540.0" y="292.0" text-anchor="middle" font-size="11">NoSuchElementException</text></g>
+<path class="edge" d="M 490.0 330.0 L 510.0 330.0"/>
+<polygon class="edge-head" points="510.0,330.0 500.0,334.6 500.0,325.4"/>
+<g class="pill node" style="animation-delay:0.68s"><rect x="372.8" y="303.0" width="254.5" height="22" rx="11"/><text x="500.0" y="318.0" text-anchor="middle" font-size="11">heal(driver, field name, exception)</text></g>
+<path class="edge" d="M 650.0 374.0 L 670.0 374.0"/>
+<polygon class="edge-head" points="670.0,374.0 660.0,378.6 660.0,369.4"/>
+<g class="pill node" style="animation-delay:0.68s"><rect x="502.6" y="347.0" width="314.8" height="22" rx="11"/><text x="660.0" y="362.0" text-anchor="middle" font-size="11">send(system prompt, page HTML + description)</text></g>
+<path class="edge" d="M 810.0 418.0 L 830.0 418.0"/>
+<polygon class="edge-head" points="830.0,418.0 820.0,422.6 820.0,413.4"/>
+<g class="pill node" style="animation-delay:0.68s"><rect x="753.0" y="391.0" width="133.9" height="22" rx="11"/><text x="820.0" y="406.0" text-anchor="middle" font-size="11">POST /v1/messages</text></g>
+<path class="edge reply" d="M 830.0 462.0 L 810.0 462.0"/>
+<polygon class="edge-head" points="810.0,462.0 820.0,457.4 820.0,466.6"/>
+<g class="pill node" style="animation-delay:0.68s"><rect x="719.5" y="435.0" width="200.9" height="22" rx="11"/><text x="820.0" y="450.0" text-anchor="middle" font-size="11">selector text + token usage</text></g>
+<path class="edge reply" d="M 670.0 506.0 L 650.0 506.0"/>
+<polygon class="edge-head" points="650.0,506.0 660.0,501.4 660.0,510.6"/>
+<g class="pill node" style="animation-delay:0.68s"><rect x="613.1" y="479.0" width="93.7" height="22" rx="11"/><text x="660.0" y="494.0" text-anchor="middle" font-size="11">LlmResponse</text></g>
+<path class="edge" d="M 650.0 550.0 L 990.0 550.0"/>
+<polygon class="edge-head" points="990.0,550.0 980.0,554.6 980.0,545.4"/>
+<g class="pill node" style="animation-delay:0.68s"><rect x="696.1" y="523.0" width="247.8" height="22" rx="11"/><text x="820.0" y="538.0" text-anchor="middle" font-size="11">logHealCall(element, model, usage)</text></g>
+<path class="edge" d="M 580 594 L 616 594 L 616 622 L 580 622"/>
+<polygon class="edge-head" points="580.0,622.0 590.0,617.4 590.0,626.6"/>
+<g class="pill node" style="animation-delay:0.68s"><rect x="579.5" y="597.0" width="241.1" height="22" rx="11"/><text x="700.0" y="612.0" text-anchor="middle" font-size="11">parse selector, retry findElement</text></g>
+<path class="edge reply" d="M 510.0 646.0 L 330.0 646.0"/>
+<polygon class="edge-head" points="330.0,646.0 340.0,641.4 340.0,650.6"/>
+<g class="pill node" style="animation-delay:0.68s"><rect x="376.5" y="619.0" width="87.0" height="22" rx="11"/><text x="420.0" y="634.0" text-anchor="middle" font-size="11">WebElement</text></g>
+</svg>

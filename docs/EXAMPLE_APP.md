@@ -86,17 +86,7 @@ only — it is never reachable from outside the machine.
 
 ## Topology: everything local
 
-```mermaid
-flowchart TD
-    subgraph jvm [Test JVM — one per Failsafe fork]
-        CUK[Cucumber scenarios<br/>step definitions]
-        APP[ExampleAppServer<br/>127.0.0.1, ephemeral port<br/>serves app-pages/*.html]
-        CUK -->|glue| APP
-    end
-    BR[Browser<br/>Chrome / Firefox, headless in CI]
-    CUK -->|Selenium WebDriver| BR
-    BR -->|HTTP| APP
-```
+![Example app topology: everything local](diagrams/example-app-topology.svg)
 
 The browser and the app both live on the same machine; the only
 network traffic is loopback. That's what makes the suite
@@ -105,57 +95,14 @@ WebDriverManager has cached the driver binary once).
 
 ## Server lifecycle sequence
 
-```mermaid
-sequenceDiagram
-    participant H as AppServerHooks<br/>(@BeforeAll / @AfterAll)
-    participant S as ExampleAppServer
-    participant P as Page objects
-    participant B as Browser
-
-    H->>S: start()
-    S-->>H: bound to 127.0.0.1:PORT
-    H->>H: set example.fixture.baseUrl
-    P->>H: baseUrl()
-    H-->>P: http://127.0.0.1:PORT
-    P->>B: driver.get(baseUrl + "/tables")
-    B->>S: GET /tables
-    S-->>B: tables.html
-    Note over P,B: scenarios run...
-    H->>S: stop()
-    H->>H: clear example.fixture.baseUrl
-```
+![Example app server lifecycle sequence](diagrams/server-lifecycle-sequence.svg)
 
 ## Capability → example mapping
 
 Each framework capability the repo wants to teach has exactly one
 feature file, one page object, and one app page:
 
-```mermaid
-flowchart TD
-    W[Wait<br/>explicit waits] --> F1[dynamic_loading.feature]
-    TH[TableHelper] --> F2[tables.feature]
-    DD[DragDropHelper] --> F3[drag_drop.feature]
-    FU[FileUploadHelper] --> F4[file_upload.feature]
-    BP[BasePage + @FindBy<br/>page-object pattern] --> F5[login.feature]
-    BP --> F6[Home_page.feature]
-    BP --> F7[Search.feature]
-
-    F1 --> P1[DynamicLoadingPage]
-    F2 --> P2[TablesPage]
-    F3 --> P3[DragDropPage]
-    F4 --> P4[FileUploadPage]
-    F5 --> P5[LoginPage]
-    F6 --> P6[HomePage]
-    F7 --> P7[SearchResultPage]
-
-    P1 --> A1["/dynamic<br/>#load-button, #delayed-content"]
-    P2 --> A2["/tables<br/>table#employees, #sort-salary"]
-    P3 --> A3["/drag-drop<br/>#drag-source, #drop-target"]
-    P4 --> A4["/upload<br/>#file-input, #upload-button"]
-    P5 --> A5["/login<br/>#username, #password, #welcome"]
-    P6 --> A6["/<br/>#logo, #search-box"]
-    P7 --> A7["/search<br/>#results-heading, .result-url"]
-```
+![Capability to example mapping](diagrams/capability-mapping.svg)
 
 If you're new to the framework, `dynamic_loading.feature` is the
 gentlest starting point (one wait, one assertion), and `login.feature`

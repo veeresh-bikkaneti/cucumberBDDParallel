@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Original Mermaid source (d15.mmd):
+# file: README.md
+# section: ## AI self-healing locators
+# type: flowchart TD
+flowchart TD
+    A[Step definition calls a page object method] - -> B[Selenium looks up the @FindBy element]
+    B - -> C{Element found?}
+    C - ->|Yes| D[Test continues]
+    C - ->|No, healing off| E[Test fails: NoSuchElementException]
+    C - ->|No, healing on| F[Send page HTML to configured LLM]
+    F - -> G[LLM suggests a CSS selector]
+    G - -> H{New selector finds it?}
+    H - ->|Yes| D
+    H - ->|No| E
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 800" width="960" height="800" role="img">
+<title>AI self-healing locators</title>
+<style>
+text{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.node{animation:node-in .6s cubic-bezier(.22,.61,.36,1) both}
+@keyframes node-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.edge{fill:none;stroke:#57534e;stroke-width:1.8;stroke-dasharray:7 5;animation:dash-flow 2.6s linear infinite}
+.edge.reply{stroke-dasharray:2 5}
+.edge-head{fill:#57534e}
+.life{stroke:#a8a29e;stroke-width:1.2;stroke-dasharray:5 5}
+.subg{fill:none;stroke:#a8a29e;stroke-width:1.4;stroke-dasharray:8 5}
+.subgtitle{fill:#78716c;font-weight:700;letter-spacing:.05em}
+.lbl{fill:#44403c}
+.pill{fill:#fafaf9;stroke:#d6d3d1;stroke-width:1.2}
+.role-client .box{fill:#ecfeff;stroke:#0891b2}
+.role-client text{fill:#164e63}
+.role-service .box{fill:#ecfdf5;stroke:#059669}
+.role-service text{fill:#064e3b}
+.role-data .box{fill:#f5f3ff;stroke:#7c3aed}
+.role-data text{fill:#4c1d95}
+.role-cloud .box{fill:#fffbeb;stroke:#d97706}
+.role-cloud text{fill:#78350f}
+.role-security .box{fill:#fff1f2;stroke:#e11d48}
+.role-security text{fill:#881337}
+.role-neutral .box{fill:#fafaf9;stroke:#a8a29e}
+.role-neutral text{fill:#1c1917}
+@media (prefers-color-scheme:dark){
+.edge{stroke:#94a3b8}.edge-head{fill:#94a3b8}
+.life{stroke:#475569}.subg{stroke:#475569}.subgtitle{fill:#94a3b8}
+.lbl{fill:#cbd5e1}.pill{fill:#1e293b;stroke:#475569}
+.role-client .box{fill:#083344;stroke:#22d3ee}.role-client text{fill:#a5f3fc}
+.role-service .box{fill:#022c22;stroke:#34d399}.role-service text{fill:#a7f3d0}
+.role-data .box{fill:#2e1065;stroke:#a78bfa}.role-data text{fill:#ddd6fe}
+.role-cloud .box{fill:#451a03;stroke:#fbbf24}.role-cloud text{fill:#fde68a}
+.role-security .box{fill:#4c0519;stroke:#fb7185}.role-security text{fill:#fecdd3}
+.role-neutral .box{fill:#1e293b;stroke:#64748b}.role-neutral text{fill:#e2e8f0}
+}
+@media (prefers-reduced-motion:reduce){.node,.edge{animation:none!important}}
+@keyframes dash-flow{to{stroke-dashoffset:-24}}
+</style>
+<g class="node role-client" style="animation-delay:0.05s"><rect class="box" x="260" y="40" width="380" height="60" rx="8" stroke-width="1.8"/><text x="450" y="66.4" text-anchor="middle" font-size="12">Step definition calls</text><text x="450" y="82.2" text-anchor="middle" font-size="12">a page object method</text></g>
+<g class="node role-service" style="animation-delay:0.12s"><rect class="box" x="270" y="155" width="360" height="60" rx="8" stroke-width="1.8"/><text x="450" y="181.4" text-anchor="middle" font-size="12">Selenium looks up</text><text x="450" y="197.2" text-anchor="middle" font-size="12">the @FindBy element</text></g>
+<g class="node role-neutral" style="animation-delay:0.19s"><polygon class="box" points="450,255 565,310 450,365 335,310" stroke-width="1.8"/><text x="450" y="314.3" text-anchor="middle" font-size="12">Element found?</text></g>
+<g class="node role-service" style="animation-delay:0.26s"><rect class="box" x="675" y="280" width="190" height="60" rx="8" stroke-width="1.8"/><text x="770" y="314.3" text-anchor="middle" font-size="12">Test continues</text></g>
+<g class="node role-cloud" style="animation-delay:0.33s"><rect class="box" x="290" y="430" width="320" height="60" rx="8" stroke-width="1.8"/><text x="450" y="456.4" text-anchor="middle" font-size="12">Send page HTML</text><text x="450" y="472.2" text-anchor="middle" font-size="12">to configured LLM</text></g>
+<g class="node role-cloud" style="animation-delay:0.40s"><rect class="box" x="290" y="545" width="320" height="60" rx="8" stroke-width="1.8"/><text x="450" y="571.4" text-anchor="middle" font-size="12">LLM suggests</text><text x="450" y="587.2" text-anchor="middle" font-size="12">a CSS selector</text></g>
+<g class="node role-neutral" style="animation-delay:0.47s"><polygon class="box" points="450,640 575,695 450,750 325,695" stroke-width="1.8"/><text x="450" y="699.3" text-anchor="middle" font-size="12">New selector finds it?</text></g>
+<g class="node role-security" style="animation-delay:0.54s"><rect class="box" x="45" y="661" width="230" height="68" rx="8" stroke-width="1.8"/><text x="160" y="691.7" text-anchor="middle" font-size="11">Test fails:</text><text x="160" y="706.2" text-anchor="middle" font-size="11">NoSuchElementException</text></g>
+<polyline class="edge" points="450,100 450.0,144.0"/>
+<polygon class="edge-head" points="450,155 445.5,144.0 454.5,144.0"/>
+<polyline class="edge" points="450,215 450.0,244.0"/>
+<polygon class="edge-head" points="450,255 445.5,244.0 454.5,244.0"/>
+<polyline class="edge" points="565,310 664.0,310.0"/>
+<polygon class="edge-head" points="675,310 664.0,314.5 664.0,305.5"/>
+<g><rect class="pill" x="602" y="298" width="37" height="24" rx="12"/><text class="lbl" x="620" y="313.8" text-anchor="middle" font-size="10.5">Yes</text></g>
+<polyline class="edge" points="450,365 450.0,419.0"/>
+<polygon class="edge-head" points="450,430 445.5,419.0 454.5,419.0"/>
+<g><rect class="pill" x="397" y="385" width="106" height="24" rx="12"/><text class="lbl" x="450" y="400.8" text-anchor="middle" font-size="10.5">No, healing on</text></g>
+<polyline class="edge" points="335,310 110,310 110,695 56.0,695.0"/>
+<polygon class="edge-head" points="45,695 56.0,690.5 56.0,699.5"/>
+<g><rect class="pill" x="166" y="298" width="112" height="24" rx="12"/><text class="lbl" x="222" y="313.8" text-anchor="middle" font-size="10.5">No, healing off</text></g>
+<polyline class="edge" points="450,490 450.0,534.0"/>
+<polygon class="edge-head" points="450,545 445.5,534.0 454.5,534.0"/>
+<polyline class="edge" points="450,605 450.0,629.0"/>
+<polygon class="edge-head" points="450,640 445.5,629.0 454.5,629.0"/>
+<polyline class="edge" points="575,695 900,695 900,310 876.0,310.0"/>
+<polygon class="edge-head" points="865,310 876.0,305.5 876.0,314.5"/>
+<g><rect class="pill" x="719" y="683" width="37" height="24" rx="12"/><text class="lbl" x="737" y="698.8" text-anchor="middle" font-size="10.5">Yes</text></g>
+<polyline class="edge" points="325,695 286.0,695.0"/>
+<polygon class="edge-head" points="275,695 286.0,690.5 286.0,699.5"/>
+<g><rect class="pill" x="285" y="683" width="31" height="24" rx="12"/><text class="lbl" x="300" y="698.8" text-anchor="middle" font-size="10.5">No</text></g>
+</svg>

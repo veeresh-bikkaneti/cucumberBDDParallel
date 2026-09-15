@@ -78,18 +78,7 @@ Every healing call logs token usage and cost; a session total is
 logged at JVM exit. Full provider setup, the env var reference, and
 cost tracking: [`docs/AI_HEALING.md`](docs/AI_HEALING.md).
 
-```mermaid
-flowchart TD
-    A[Step definition calls a page object method] --> B[Selenium looks up the @FindBy element]
-    B --> C{Element found?}
-    C -->|Yes| D[Test continues]
-    C -->|No, healing off| E[Test fails: NoSuchElementException]
-    C -->|No, healing on| F[Send page HTML to configured LLM]
-    F --> G[LLM suggests a CSS selector]
-    G --> H{New selector finds it?}
-    H -->|Yes| D
-    H -->|No| E
-```
+![AI self-healing locators decision flow](docs/diagrams/readme-ai-healing.svg)
 
 ## Using `framework` in your own project
 

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Original Mermaid source (d09.mmd):
+# file: docs/ARCHITECTURE.md
+# section: ## Docker topology
+# type: flowchart TD
+flowchart TD
+    subgraph img [cucumberbddparallel-examples image]
+        MVN[maven:3.9.16-eclipse-temurin-21]
+        CHR[google-chrome-stable]
+        TES[tesseract-ocr + eng data]
+    end
+    SVC1[cucumber-examples<br/>runs both demo modules<br/>shm 2gb]
+    SVC2[cucumber-examples-ocr<br/>profile: ocr<br/>OcrValidationTest only]
+    SVC3[cucumber-integration<br/>profile: integration<br/>example-tests verify]
+    OLL[ollama<br/>profile via docker-compose.ollama.yml<br/>ollama/ollama:0.34.0]
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 620" width="960" height="620" role="img">
+<title>Docker topology</title>
+<style>
+text{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.node{animation:node-in .6s cubic-bezier(.22,.61,.36,1) both}
+@keyframes node-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.edge{fill:none;stroke:#57534e;stroke-width:1.8;stroke-dasharray:7 5;animation:dash-flow 2.6s linear infinite}
+.edge.reply{stroke-dasharray:2 5}
+.edge-head{fill:#57534e}
+.life{stroke:#a8a29e;stroke-width:1.2;stroke-dasharray:5 5}
+.subg{fill:none;stroke:#a8a29e;stroke-width:1.4;stroke-dasharray:8 5}
+.subgtitle{fill:#78716c;font-weight:700;letter-spacing:.05em}
+.lbl{fill:#44403c}
+.pill{fill:#fafaf9;stroke:#d6d3d1;stroke-width:1.2}
+.role-client .box{fill:#ecfeff;stroke:#0891b2}
+.role-client text{fill:#164e63}
+.role-service .box{fill:#ecfdf5;stroke:#059669}
+.role-service text{fill:#064e3b}
+.role-data .box{fill:#f5f3ff;stroke:#7c3aed}
+.role-data text{fill:#4c1d95}
+.role-cloud .box{fill:#fffbeb;stroke:#d97706}
+.role-cloud text{fill:#78350f}
+.role-security .box{fill:#fff1f2;stroke:#e11d48}
+.role-security text{fill:#881337}
+.role-neutral .box{fill:#fafaf9;stroke:#a8a29e}
+.role-neutral text{fill:#1c1917}
+@media (prefers-color-scheme:dark){
+.edge{stroke:#94a3b8}.edge-head{fill:#94a3b8}
+.life{stroke:#475569}.subg{stroke:#475569}.subgtitle{fill:#94a3b8}
+.lbl{fill:#cbd5e1}.pill{fill:#1e293b;stroke:#475569}
+.role-client .box{fill:#083344;stroke:#22d3ee}.role-client text{fill:#a5f3fc}
+.role-service .box{fill:#022c22;stroke:#34d399}.role-service text{fill:#a7f3d0}
+.role-data .box{fill:#2e1065;stroke:#a78bfa}.role-data text{fill:#ddd6fe}
+.role-cloud .box{fill:#451a03;stroke:#fbbf24}.role-cloud text{fill:#fde68a}
+.role-security .box{fill:#4c0519;stroke:#fb7185}.role-security text{fill:#fecdd3}
+.role-neutral .box{fill:#1e293b;stroke:#64748b}.role-neutral text{fill:#e2e8f0}
+}
+@media (prefers-reduced-motion:reduce){.node,.edge{animation:none!important}}
+@keyframes dash-flow{to{stroke-dashoffset:-24}}
+</style>
+<rect class="subg" x="40" y="60" width="300" height="380" rx="12"/>
+<text x="54" y="81" font-size="11" class="subgtitle">CUCUMBERBDDPARALLEL-EXAMPLES IMAGE</text>
+<g class="node role-neutral" style="animation-delay:0.05s"><rect class="box" x="60" y="112" width="260" height="56" rx="8" stroke-width="1.8"/><text x="190" y="144.0" text-anchor="middle" font-size="11">maven:3.9.16-eclipse-temurin-21</text></g>
+<g class="node role-neutral" style="animation-delay:0.12s"><rect class="box" x="60" y="222" width="260" height="56" rx="8" stroke-width="1.8"/><text x="190" y="254.3" text-anchor="middle" font-size="12">google-chrome-stable</text></g>
+<g class="node role-neutral" style="animation-delay:0.19s"><rect class="box" x="60" y="328" width="260" height="64" rx="8" stroke-width="1.8"/><text x="190" y="364.3" text-anchor="middle" font-size="12">tesseract-ocr + eng data</text></g>
+<g class="node role-service" style="animation-delay:0.26s"><rect class="box" x="470" y="84" width="300" height="72" rx="8" stroke-width="1.8"/><text x="620" y="108.5" text-anchor="middle" font-size="12">cucumber-examples</text><text x="620" y="124.3" text-anchor="middle" font-size="12">runs both demo modules</text><text x="620" y="140.2" text-anchor="middle" font-size="12">shm 2gb</text></g>
+<g class="node role-service" style="animation-delay:0.33s"><rect class="box" x="470" y="224" width="300" height="72" rx="8" stroke-width="1.8"/><text x="620" y="249.4" text-anchor="middle" font-size="11">cucumber-examples-ocr</text><text x="620" y="264.0" text-anchor="middle" font-size="11">profile: ocr</text><text x="620" y="278.5" text-anchor="middle" font-size="11">OcrValidationTest only</text></g>
+<g class="node role-service" style="animation-delay:0.40s"><rect class="box" x="470" y="364" width="300" height="72" rx="8" stroke-width="1.8"/><text x="620" y="389.4" text-anchor="middle" font-size="11">cucumber-integration</text><text x="620" y="404.0" text-anchor="middle" font-size="11">profile: integration</text><text x="620" y="418.5" text-anchor="middle" font-size="11">example-tests verify</text></g>
+<g class="node role-cloud" style="animation-delay:0.47s"><rect class="box" x="470" y="486" width="300" height="88" rx="8" stroke-width="1.8"/><text x="620" y="519.4" text-anchor="middle" font-size="11">ollama</text><text x="620" y="534.0" text-anchor="middle" font-size="11">profile via docker-compose.ollama.yml</text><text x="620" y="548.5" text-anchor="middle" font-size="11">ollama/ollama:0.34.0</text></g>
+</svg>

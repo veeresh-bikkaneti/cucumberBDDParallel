@@ -1,0 +1,138 @@
+<!--
+Original Mermaid source:
+# file: docs/EXAMPLE_APP.md
+# section: ## Capability → example mapping
+# type: flowchart TD
+flowchart TD
+    W[Wait<br/>explicit waits] - -> F1[dynamic_loading.feature]
+    TH[TableHelper] - -> F2[tables.feature]
+    DD[DragDropHelper] - -> F3[drag_drop.feature]
+    FU[FileUploadHelper] - -> F4[file_upload.feature]
+    BP[BasePage + @FindBy<br/>page-object pattern] - -> F5[login.feature]
+    BP - -> F6[Home_page.feature]
+    BP - -> F7[Search.feature]
+
+    F1 - -> P1[DynamicLoadingPage]
+    F2 - -> P2[TablesPage]
+    F3 - -> P3[DragDropPage]
+    F4 - -> P4[FileUploadPage]
+    F5 - -> P5[LoginPage]
+    F6 - -> P6[HomePage]
+    F7 - -> P7[SearchResultPage]
+
+    P1 - -> A1["/dynamic<br/>#load-button, #delayed-content"]
+    P2 - -> A2["/tables<br/>table#employees, #sort-salary"]
+    P3 - -> A3["/drag-drop<br/>#drag-source, #drop-target"]
+    P4 - -> A4["/upload<br/>#file-input, #upload-button"]
+    P5 - -> A5["/login<br/>#username, #password, #welcome"]
+    P6 - -> A6["/<br/>#logo, #search-box"]
+    P7 - -> A7["/search<br/>#results-heading, .result-url"]
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 640" role="img">
+<title>Capability to example mapping</title>
+<style>
+text{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.node{animation:node-in .6s cubic-bezier(.22,.61,.36,1) both}
+@keyframes node-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.edge{fill:none;stroke:#64748b;stroke-width:1.8;stroke-dasharray:7 5;animation:dash-flow 2.6s linear infinite}
+.edge.reply{stroke-dasharray:2 5}
+.edge-head{fill:#64748b;stroke:none}
+@keyframes dash-flow{to{stroke-dashoffset:-24}}
+.lifeline{stroke:#a8a29e;stroke-width:1.2;stroke-dasharray:5 5;opacity:.55}
+.body{stroke-width:1.8}
+.r-client .body{fill:#ecfeff;stroke:#0891b2}.r-client text{fill:#164e63}
+.r-service .body{fill:#ecfdf5;stroke:#059669}.r-service text{fill:#064e3b}
+.r-data .body{fill:#f5f3ff;stroke:#7c3aed}.r-data text{fill:#4c1d95}
+.r-cloud .body{fill:#fffbeb;stroke:#d97706}.r-cloud text{fill:#78350f}
+.r-security .body{fill:#fff1f2;stroke:#e11d48}.r-security text{fill:#881337}
+.r-neutral .body{fill:#fafaf9;stroke:#a8a29e}.r-neutral text{fill:#1c1917}
+.subgraph{fill:none;stroke:#a8a29e;stroke-width:1.5;stroke-dasharray:8 5}
+.subgraph-title{fill:#57534e;font-size:11px}
+.pill rect{fill:#ffffff;stroke:#a8a29e;stroke-width:1.2}
+.pill text{fill:#1c1917;font-size:11px}
+.pill.note rect{fill:#fffbeb;stroke:#d97706}
+.pill.note text{fill:#78350f}
+@media (prefers-reduced-motion:reduce){.node,.edge{animation:none!important}}
+@media (prefers-color-scheme:dark){
+.edge{stroke:#94a3b8}.edge-head{fill:#94a3b8}
+.lifeline{stroke:#475569}
+.subgraph{stroke:#64748b}.subgraph-title{fill:#94a3b8}
+.r-client .body{fill:#083344;stroke:#22d3ee}.r-client text{fill:#a5f3fc}
+.r-service .body{fill:#022c22;stroke:#34d399}.r-service text{fill:#a7f3d0}
+.r-data .body{fill:#2e1065;stroke:#a78bfa}.r-data text{fill:#ddd6fe}
+.r-cloud .body{fill:#451a03;stroke:#fbbf24}.r-cloud text{fill:#fde68a}
+.r-security .body{fill:#4c0519;stroke:#fb7185}.r-security text{fill:#fecdd3}
+.r-neutral .body{fill:#1e293b;stroke:#64748b}.r-neutral text{fill:#e2e8f0}
+.pill rect{fill:#1e293b;stroke:#475569}.pill text{fill:#e2e8f0}
+.pill.note rect{fill:#451a03;stroke:#fbbf24}.pill.note text{fill:#fde68a}
+}
+</style>
+<g class="node r-service" style="animation-delay:0.05s"><rect class="body" x="20" y="30" width="170" height="64" rx="8"/><text x="105.0" y="58.4" text-anchor="middle" font-size="11">Wait</text><text x="105.0" y="73.3" text-anchor="middle" font-size="11">explicit waits</text></g>
+<g class="node r-service" style="animation-delay:0.12s"><rect class="body" x="20" y="114" width="170" height="64" rx="8"/><text x="105.0" y="149.8" text-anchor="middle" font-size="11">TableHelper</text></g>
+<g class="node r-service" style="animation-delay:0.19s"><rect class="body" x="20" y="198" width="170" height="64" rx="8"/><text x="105.0" y="233.8" text-anchor="middle" font-size="11">DragDropHelper</text></g>
+<g class="node r-service" style="animation-delay:0.26s"><rect class="body" x="20" y="282" width="170" height="64" rx="8"/><text x="105.0" y="317.9" text-anchor="middle" font-size="11">FileUploadHelper</text></g>
+<g class="node r-service" style="animation-delay:0.33s"><rect class="body" x="20" y="366" width="170" height="232" rx="8"/><text x="105.0" y="478.4" text-anchor="middle" font-size="11">BasePage + @FindBy</text><text x="105.0" y="493.4" text-anchor="middle" font-size="11">page-object pattern</text></g>
+<g class="node r-client" style="animation-delay:0.40s"><rect class="body" x="250" y="30" width="190" height="64" rx="8"/><text x="345.0" y="65.8" text-anchor="middle" font-size="11">dynamic_loading.feature</text></g>
+<g class="node r-client" style="animation-delay:0.47s"><rect class="body" x="250" y="114" width="190" height="64" rx="8"/><text x="345.0" y="149.8" text-anchor="middle" font-size="11">tables.feature</text></g>
+<g class="node r-client" style="animation-delay:0.54s"><rect class="body" x="250" y="198" width="190" height="64" rx="8"/><text x="345.0" y="233.8" text-anchor="middle" font-size="11">drag_drop.feature</text></g>
+<g class="node r-client" style="animation-delay:0.61s"><rect class="body" x="250" y="282" width="190" height="64" rx="8"/><text x="345.0" y="317.9" text-anchor="middle" font-size="11">file_upload.feature</text></g>
+<g class="node r-client" style="animation-delay:0.68s"><rect class="body" x="250" y="366" width="190" height="64" rx="8"/><text x="345.0" y="401.9" text-anchor="middle" font-size="11">login.feature</text></g>
+<g class="node r-client" style="animation-delay:0.68s"><rect class="body" x="250" y="450" width="190" height="64" rx="8"/><text x="345.0" y="485.9" text-anchor="middle" font-size="11">Home_page.feature</text></g>
+<g class="node r-client" style="animation-delay:0.68s"><rect class="body" x="250" y="534" width="190" height="64" rx="8"/><text x="345.0" y="569.9" text-anchor="middle" font-size="11">Search.feature</text></g>
+<g class="node r-neutral" style="animation-delay:0.68s"><rect class="body" x="500" y="30" width="180" height="64" rx="8"/><text x="590.0" y="65.8" text-anchor="middle" font-size="11">DynamicLoadingPage</text></g>
+<g class="node r-neutral" style="animation-delay:0.68s"><rect class="body" x="500" y="114" width="180" height="64" rx="8"/><text x="590.0" y="149.8" text-anchor="middle" font-size="11">TablesPage</text></g>
+<g class="node r-neutral" style="animation-delay:0.68s"><rect class="body" x="500" y="198" width="180" height="64" rx="8"/><text x="590.0" y="233.8" text-anchor="middle" font-size="11">DragDropPage</text></g>
+<g class="node r-neutral" style="animation-delay:0.68s"><rect class="body" x="500" y="282" width="180" height="64" rx="8"/><text x="590.0" y="317.9" text-anchor="middle" font-size="11">FileUploadPage</text></g>
+<g class="node r-neutral" style="animation-delay:0.68s"><rect class="body" x="500" y="366" width="180" height="64" rx="8"/><text x="590.0" y="401.9" text-anchor="middle" font-size="11">LoginPage</text></g>
+<g class="node r-neutral" style="animation-delay:0.68s"><rect class="body" x="500" y="450" width="180" height="64" rx="8"/><text x="590.0" y="485.9" text-anchor="middle" font-size="11">HomePage</text></g>
+<g class="node r-neutral" style="animation-delay:0.68s"><rect class="body" x="500" y="534" width="180" height="64" rx="8"/><text x="590.0" y="569.9" text-anchor="middle" font-size="11">SearchResultPage</text></g>
+<g class="node r-data" style="animation-delay:0.68s"><rect class="body" x="740" y="30" width="260" height="64" rx="8"/><text x="870.0" y="58.4" text-anchor="middle" font-size="11">/dynamic</text><text x="870.0" y="73.3" text-anchor="middle" font-size="11">#load-button, #delayed-content</text></g>
+<g class="node r-data" style="animation-delay:0.68s"><rect class="body" x="740" y="114" width="260" height="64" rx="8"/><text x="870.0" y="142.3" text-anchor="middle" font-size="11">/tables</text><text x="870.0" y="157.3" text-anchor="middle" font-size="11">table#employees, #sort-salary</text></g>
+<g class="node r-data" style="animation-delay:0.68s"><rect class="body" x="740" y="198" width="260" height="64" rx="8"/><text x="870.0" y="226.3" text-anchor="middle" font-size="11">/drag-drop</text><text x="870.0" y="241.3" text-anchor="middle" font-size="11">#drag-source, #drop-target</text></g>
+<g class="node r-data" style="animation-delay:0.68s"><rect class="body" x="740" y="282" width="260" height="64" rx="8"/><text x="870.0" y="310.4" text-anchor="middle" font-size="11">/upload</text><text x="870.0" y="325.4" text-anchor="middle" font-size="11">#file-input, #upload-button</text></g>
+<g class="node r-data" style="animation-delay:0.68s"><rect class="body" x="740" y="366" width="260" height="64" rx="8"/><text x="870.0" y="394.4" text-anchor="middle" font-size="11">/login</text><text x="870.0" y="409.4" text-anchor="middle" font-size="11">#username, #password, #welcome</text></g>
+<g class="node r-data" style="animation-delay:0.68s"><rect class="body" x="740" y="450" width="260" height="64" rx="8"/><text x="870.0" y="478.4" text-anchor="middle" font-size="11">/</text><text x="870.0" y="493.4" text-anchor="middle" font-size="11">#logo, #search-box</text></g>
+<g class="node r-data" style="animation-delay:0.68s"><rect class="body" x="740" y="534" width="260" height="64" rx="8"/><text x="870.0" y="562.4" text-anchor="middle" font-size="11">/search</text><text x="870.0" y="577.4" text-anchor="middle" font-size="11">#results-heading, .result-url</text></g>
+<path class="edge" d="M 190.0 62.0 L 250.0 62.0"/>
+<polygon class="edge-head" points="250.0,62.0 240.0,66.6 240.0,57.4"/>
+<path class="edge" d="M 190.0 146.0 L 250.0 146.0"/>
+<polygon class="edge-head" points="250.0,146.0 240.0,150.6 240.0,141.4"/>
+<path class="edge" d="M 190.0 230.0 L 250.0 230.0"/>
+<polygon class="edge-head" points="250.0,230.0 240.0,234.6 240.0,225.4"/>
+<path class="edge" d="M 190.0 314.0 L 250.0 314.0"/>
+<polygon class="edge-head" points="250.0,314.0 240.0,318.6 240.0,309.4"/>
+<path class="edge" d="M 190.0 398.0 L 250.0 398.0"/>
+<polygon class="edge-head" points="250.0,398.0 240.0,402.6 240.0,393.4"/>
+<path class="edge" d="M 190.0 482.0 L 250.0 482.0"/>
+<polygon class="edge-head" points="250.0,482.0 240.0,486.6 240.0,477.4"/>
+<path class="edge" d="M 190.0 566.0 L 250.0 566.0"/>
+<polygon class="edge-head" points="250.0,566.0 240.0,570.6 240.0,561.4"/>
+<path class="edge" d="M 440.0 62.0 L 500.0 62.0"/>
+<polygon class="edge-head" points="500.0,62.0 490.0,66.6 490.0,57.4"/>
+<path class="edge" d="M 680.0 62.0 L 740.0 62.0"/>
+<polygon class="edge-head" points="740.0,62.0 730.0,66.6 730.0,57.4"/>
+<path class="edge" d="M 440.0 146.0 L 500.0 146.0"/>
+<polygon class="edge-head" points="500.0,146.0 490.0,150.6 490.0,141.4"/>
+<path class="edge" d="M 680.0 146.0 L 740.0 146.0"/>
+<polygon class="edge-head" points="740.0,146.0 730.0,150.6 730.0,141.4"/>
+<path class="edge" d="M 440.0 230.0 L 500.0 230.0"/>
+<polygon class="edge-head" points="500.0,230.0 490.0,234.6 490.0,225.4"/>
+<path class="edge" d="M 680.0 230.0 L 740.0 230.0"/>
+<polygon class="edge-head" points="740.0,230.0 730.0,234.6 730.0,225.4"/>
+<path class="edge" d="M 440.0 314.0 L 500.0 314.0"/>
+<polygon class="edge-head" points="500.0,314.0 490.0,318.6 490.0,309.4"/>
+<path class="edge" d="M 680.0 314.0 L 740.0 314.0"/>
+<polygon class="edge-head" points="740.0,314.0 730.0,318.6 730.0,309.4"/>
+<path class="edge" d="M 440.0 398.0 L 500.0 398.0"/>
+<polygon class="edge-head" points="500.0,398.0 490.0,402.6 490.0,393.4"/>
+<path class="edge" d="M 680.0 398.0 L 740.0 398.0"/>
+<polygon class="edge-head" points="740.0,398.0 730.0,402.6 730.0,393.4"/>
+<path class="edge" d="M 440.0 482.0 L 500.0 482.0"/>
+<polygon class="edge-head" points="500.0,482.0 490.0,486.6 490.0,477.4"/>
+<path class="edge" d="M 680.0 482.0 L 740.0 482.0"/>
+<polygon class="edge-head" points="740.0,482.0 730.0,486.6 730.0,477.4"/>
+<path class="edge" d="M 440.0 566.0 L 500.0 566.0"/>
+<polygon class="edge-head" points="500.0,566.0 490.0,570.6 490.0,561.4"/>
+<path class="edge" d="M 680.0 566.0 L 740.0 566.0"/>
+<polygon class="edge-head" points="740.0,566.0 730.0,570.6 730.0,561.4"/>
+</svg>

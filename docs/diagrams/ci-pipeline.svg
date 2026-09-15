@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Original Mermaid source (d08.mmd):
+# file: docs/ARCHITECTURE.md
+# section: ## CI pipeline
+# type: flowchart TD
+flowchart TD
+    TRIG[push to main / pull_request] - -> UT[unit-tests<br/>framework JUnit 5 suite<br/>no browser, no network]
+    UT - -> AHD[ai-healing-demo<br/>MockAiHealingDemoTest<br/>deterministic, no API key]
+    UT - -> WPD[web-patterns-demo<br/>local fixtures<br/>headless Chrome]
+    UT - -> E2E[e2e-no-ai<br/>example-tests, healing off]
+    UT - -> EAI[e2e-with-ai<br/>example-tests, healing on]
+    EAI - -> KEY{ANTHROPIC_API_KEY<br/>secret set?}
+    KEY - ->|no| SKIP[skip gracefully<br/>note in job summary]
+    KEY - ->|yes| RUN[run with healing<br/>cost → job summary]
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" width="1200" height="700" role="img">
+<title>CI pipeline</title>
+<style>
+text{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.node{animation:node-in .6s cubic-bezier(.22,.61,.36,1) both}
+@keyframes node-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.edge{fill:none;stroke:#57534e;stroke-width:1.8;stroke-dasharray:7 5;animation:dash-flow 2.6s linear infinite}
+.edge.reply{stroke-dasharray:2 5}
+.edge-head{fill:#57534e}
+.life{stroke:#a8a29e;stroke-width:1.2;stroke-dasharray:5 5}
+.subg{fill:none;stroke:#a8a29e;stroke-width:1.4;stroke-dasharray:8 5}
+.subgtitle{fill:#78716c;font-weight:700;letter-spacing:.05em}
+.lbl{fill:#44403c}
+.pill{fill:#fafaf9;stroke:#d6d3d1;stroke-width:1.2}
+.role-client .box{fill:#ecfeff;stroke:#0891b2}
+.role-client text{fill:#164e63}
+.role-service .box{fill:#ecfdf5;stroke:#059669}
+.role-service text{fill:#064e3b}
+.role-data .box{fill:#f5f3ff;stroke:#7c3aed}
+.role-data text{fill:#4c1d95}
+.role-cloud .box{fill:#fffbeb;stroke:#d97706}
+.role-cloud text{fill:#78350f}
+.role-security .box{fill:#fff1f2;stroke:#e11d48}
+.role-security text{fill:#881337}
+.role-neutral .box{fill:#fafaf9;stroke:#a8a29e}
+.role-neutral text{fill:#1c1917}
+@media (prefers-color-scheme:dark){
+.edge{stroke:#94a3b8}.edge-head{fill:#94a3b8}
+.life{stroke:#475569}.subg{stroke:#475569}.subgtitle{fill:#94a3b8}
+.lbl{fill:#cbd5e1}.pill{fill:#1e293b;stroke:#475569}
+.role-client .box{fill:#083344;stroke:#22d3ee}.role-client text{fill:#a5f3fc}
+.role-service .box{fill:#022c22;stroke:#34d399}.role-service text{fill:#a7f3d0}
+.role-data .box{fill:#2e1065;stroke:#a78bfa}.role-data text{fill:#ddd6fe}
+.role-cloud .box{fill:#451a03;stroke:#fbbf24}.role-cloud text{fill:#fde68a}
+.role-security .box{fill:#4c0519;stroke:#fb7185}.role-security text{fill:#fecdd3}
+.role-neutral .box{fill:#1e293b;stroke:#64748b}.role-neutral text{fill:#e2e8f0}
+}
+@media (prefers-reduced-motion:reduce){.node,.edge{animation:none!important}}
+@keyframes dash-flow{to{stroke-dashoffset:-24}}
+</style>
+<g class="node role-neutral" style="animation-delay:0.05s"><rect class="box" x="290" y="32" width="320" height="56" rx="28" stroke-width="1.8"/><text x="450" y="64.3" text-anchor="middle" font-size="12">push to main / pull_request</text></g>
+<g class="node role-service" style="animation-delay:0.12s"><rect class="box" x="310" y="131" width="280" height="88" rx="8" stroke-width="1.8"/><text x="450" y="164.4" text-anchor="middle" font-size="11">unit-tests</text><text x="450" y="179.0" text-anchor="middle" font-size="11">framework JUnit 5 suite</text><text x="450" y="193.5" text-anchor="middle" font-size="11">no browser, no network</text></g>
+<g class="node role-service" style="animation-delay:0.19s"><rect class="box" x="50" y="286" width="200" height="88" rx="8" stroke-width="1.8"/><text x="150" y="319.4" text-anchor="middle" font-size="11">ai-healing-demo</text><text x="150" y="334.0" text-anchor="middle" font-size="11">MockAiHealingDemoTest</text><text x="150" y="348.5" text-anchor="middle" font-size="11">deterministic, no API key</text></g>
+<g class="node role-service" style="animation-delay:0.26s"><rect class="box" x="290" y="286" width="200" height="88" rx="8" stroke-width="1.8"/><text x="390" y="318.5" text-anchor="middle" font-size="12">web-patterns-demo</text><text x="390" y="334.3" text-anchor="middle" font-size="12">local fixtures</text><text x="390" y="350.2" text-anchor="middle" font-size="12">headless Chrome</text></g>
+<g class="node role-service" style="animation-delay:0.33s"><rect class="box" x="530" y="294" width="200" height="72" rx="8" stroke-width="1.8"/><text x="630" y="326.4" text-anchor="middle" font-size="12">e2e-no-ai</text><text x="630" y="342.2" text-anchor="middle" font-size="12">example-tests, healing off</text></g>
+<g class="node role-service" style="animation-delay:0.40s"><rect class="box" x="770" y="294" width="200" height="72" rx="8" stroke-width="1.8"/><text x="870" y="326.4" text-anchor="middle" font-size="12">e2e-with-ai</text><text x="870" y="342.2" text-anchor="middle" font-size="12">example-tests, healing on</text></g>
+<g class="node role-security" style="animation-delay:0.47s"><polygon class="box" points="870,415 980,470 870,525 760,470" stroke-width="1.8"/><text x="870" y="466.4" text-anchor="middle" font-size="12">ANTHROPIC_API_KEY</text><text x="870" y="482.2" text-anchor="middle" font-size="12">secret set?</text></g>
+<g class="node role-neutral" style="animation-delay:0.54s"><rect class="box" x="490" y="574" width="220" height="72" rx="8" stroke-width="1.8"/><text x="600" y="606.4" text-anchor="middle" font-size="12">skip gracefully</text><text x="600" y="622.2" text-anchor="middle" font-size="12">note in job summary</text></g>
+<g class="node role-service" style="animation-delay:0.61s"><rect class="box" x="930" y="574" width="220" height="72" rx="8" stroke-width="1.8"/><text x="1040" y="606.4" text-anchor="middle" font-size="12">run with healing</text><text x="1040" y="622.2" text-anchor="middle" font-size="12">cost → job summary</text></g>
+<polyline class="edge" points="450,88 450.0,120.0"/>
+<polygon class="edge-head" points="450,131 445.5,120.0 454.5,120.0"/>
+<polyline class="edge" points="450,219 450,270 150,270 150.0,275.0"/>
+<polygon class="edge-head" points="150,286 145.5,275.0 154.5,275.0"/>
+<polyline class="edge" points="450,219 450,270 390,270 390.0,275.0"/>
+<polygon class="edge-head" points="390,286 385.5,275.0 394.5,275.0"/>
+<polyline class="edge" points="450,219 450,270 630,270 630.0,283.0"/>
+<polygon class="edge-head" points="630,294 625.5,283.0 634.5,283.0"/>
+<polyline class="edge" points="450,219 450,270 870,270 870.0,283.0"/>
+<polygon class="edge-head" points="870,294 865.5,283.0 874.5,283.0"/>
+<polyline class="edge" points="870,366 870.0,404.0"/>
+<polygon class="edge-head" points="870,415 865.5,404.0 874.5,404.0"/>
+<polyline class="edge" points="760,470 640,470 640.0,563.0"/>
+<polygon class="edge-head" points="640,574 635.5,563.0 644.5,563.0"/>
+<g><rect class="pill" x="685" y="458" width="31" height="24" rx="12"/><text class="lbl" x="700" y="473.8" text-anchor="middle" font-size="10.5">no</text></g>
+<polyline class="edge" points="980,470 1100,470 1100.0,563.0"/>
+<polygon class="edge-head" points="1100,574 1095.5,563.0 1104.5,563.0"/>
+<g><rect class="pill" x="1022" y="458" width="37" height="24" rx="12"/><text class="lbl" x="1040" y="473.8" text-anchor="middle" font-size="10.5">yes</text></g>
+</svg>

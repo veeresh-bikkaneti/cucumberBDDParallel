@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Original Mermaid source (d06.mmd):
+# file: docs/ARCHITECTURE.md
+# section: ## AI self-healing, end to end
+# type: sequenceDiagram
+sequenceDiagram
+    participant Step as Step definition
+    participant Page as Page object
+    participant Loc as SelfHealingElementLocator
+    participant Cache as Healed-selector cache
+    participant Heal as AiLocatorHealer
+    participant Cli as LlmMessagesClient
+    participant LLM as Configured LLM API
+    participant Cost as CostLogger
+
+    Step->>Page: page.search("…")
+    Page->>Loc: findElement()
+    Loc->>Cache: healed selector for this field?
+    Cache- ->>Loc: yes → try it first
+    Loc->>Loc: default @FindBy lookup
+    Loc- ->>Loc: NoSuchElementException
+    Loc->>Heal: heal(driver, field, cause)
+    Heal->>Cli: POST chat payload<br/>(system prompt + page HTML + description)
+    Cli->>LLM: HTTP (30s timeout,<br/>retry 429/5xx with backoff)
+    LLM- ->>Cli: CSS selector + token usage
+    Cli- ->>Heal: selector
+    Heal->>Cost: logHealCall(element, model, tokens, $)
+    Heal->>Loc: retry findElement with healed selector
+    Loc->>Cache: store healed selector
+    Loc- ->>Page: WebElement
+    Note over Heal,Loc: If the healed selector also fails,<br/>the ORIGINAL NoSuchElementException<br/>is rethrown (healing error suppressed).
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1320 950" width="1320" height="950" role="img">
+<title>AI self-healing, end to end</title>
+<style>
+text{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.node{animation:node-in .6s cubic-bezier(.22,.61,.36,1) both}
+@keyframes node-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.edge{fill:none;stroke:#57534e;stroke-width:1.8;stroke-dasharray:7 5;animation:dash-flow 2.6s linear infinite}
+.edge.reply{stroke-dasharray:2 5}
+.edge-head{fill:#57534e}
+.life{stroke:#a8a29e;stroke-width:1.2;stroke-dasharray:5 5}
+.subg{fill:none;stroke:#a8a29e;stroke-width:1.4;stroke-dasharray:8 5}
+.subgtitle{fill:#78716c;font-weight:700;letter-spacing:.05em}
+.lbl{fill:#44403c}
+.pill{fill:#fafaf9;stroke:#d6d3d1;stroke-width:1.2}
+.role-client .box{fill:#ecfeff;stroke:#0891b2}
+.role-client text{fill:#164e63}
+.role-service .box{fill:#ecfdf5;stroke:#059669}
+.role-service text{fill:#064e3b}
+.role-data .box{fill:#f5f3ff;stroke:#7c3aed}
+.role-data text{fill:#4c1d95}
+.role-cloud .box{fill:#fffbeb;stroke:#d97706}
+.role-cloud text{fill:#78350f}
+.role-security .box{fill:#fff1f2;stroke:#e11d48}
+.role-security text{fill:#881337}
+.role-neutral .box{fill:#fafaf9;stroke:#a8a29e}
+.role-neutral text{fill:#1c1917}
+@media (prefers-color-scheme:dark){
+.edge{stroke:#94a3b8}.edge-head{fill:#94a3b8}
+.life{stroke:#475569}.subg{stroke:#475569}.subgtitle{fill:#94a3b8}
+.lbl{fill:#cbd5e1}.pill{fill:#1e293b;stroke:#475569}
+.role-client .box{fill:#083344;stroke:#22d3ee}.role-client text{fill:#a5f3fc}
+.role-service .box{fill:#022c22;stroke:#34d399}.role-service text{fill:#a7f3d0}
+.role-data .box{fill:#2e1065;stroke:#a78bfa}.role-data text{fill:#ddd6fe}
+.role-cloud .box{fill:#451a03;stroke:#fbbf24}.role-cloud text{fill:#fde68a}
+.role-security .box{fill:#4c0519;stroke:#fb7185}.role-security text{fill:#fecdd3}
+.role-neutral .box{fill:#1e293b;stroke:#64748b}.role-neutral text{fill:#e2e8f0}
+}
+@media (prefers-reduced-motion:reduce){.node,.edge{animation:none!important}}
+@keyframes dash-flow{to{stroke-dashoffset:-24}}
+</style>
+<g class="node role-client" style="animation-delay:0.05s"><rect class="box" x="30" y="24" width="140" height="58" rx="8" stroke-width="1.8"/><text x="100" y="49.4" text-anchor="middle" font-size="12">Step</text><text x="100" y="65.2" text-anchor="middle" font-size="12">definition</text></g>
+<g class="node role-service" style="animation-delay:0.12s"><rect class="box" x="190" y="24" width="140" height="58" rx="8" stroke-width="1.8"/><text x="260" y="57.3" text-anchor="middle" font-size="12">Page object</text></g>
+<g class="node role-service" style="animation-delay:0.19s"><rect class="box" x="350" y="24" width="140" height="58" rx="8" stroke-width="1.8"/><text x="420" y="49.4" text-anchor="middle" font-size="12">SelfHealing</text><text x="420" y="65.2" text-anchor="middle" font-size="12">ElementLocator</text></g>
+<g class="node role-data" style="animation-delay:0.26s"><rect class="box" x="510" y="24" width="140" height="58" rx="8" stroke-width="1.8"/><text x="580" y="49.4" text-anchor="middle" font-size="12">Healed-selector</text><text x="580" y="65.2" text-anchor="middle" font-size="12">cache</text></g>
+<g class="node role-service" style="animation-delay:0.33s"><rect class="box" x="670" y="24" width="140" height="58" rx="8" stroke-width="1.8"/><text x="740" y="57.3" text-anchor="middle" font-size="12">AiLocatorHealer</text></g>
+<g class="node role-cloud" style="animation-delay:0.40s"><rect class="box" x="830" y="24" width="140" height="58" rx="8" stroke-width="1.8"/><text x="900" y="57.3" text-anchor="middle" font-size="12">LlmMessagesClient</text></g>
+<g class="node role-cloud" style="animation-delay:0.47s"><rect class="box" x="990" y="24" width="140" height="58" rx="8" stroke-width="1.8"/><text x="1060" y="49.4" text-anchor="middle" font-size="12">Configured</text><text x="1060" y="65.2" text-anchor="middle" font-size="12">LLM API</text></g>
+<g class="node role-neutral" style="animation-delay:0.54s"><rect class="box" x="1150" y="24" width="140" height="58" rx="8" stroke-width="1.8"/><text x="1220" y="57.3" text-anchor="middle" font-size="12">CostLogger</text></g>
+<line class="life" x1="100" y1="92" x2="100" y2="912"/>
+<line class="life" x1="260" y1="92" x2="260" y2="912"/>
+<line class="life" x1="420" y1="92" x2="420" y2="912"/>
+<line class="life" x1="580" y1="92" x2="580" y2="912"/>
+<line class="life" x1="740" y1="92" x2="740" y2="912"/>
+<line class="life" x1="900" y1="92" x2="900" y2="912"/>
+<line class="life" x1="1060" y1="92" x2="1060" y2="912"/>
+<line class="life" x1="1220" y1="92" x2="1220" y2="912"/>
+<polyline class="edge" points="100,140 249.0,140.0"/>
+<polygon class="edge-head" points="260,140 249.0,144.5 249.0,135.5"/>
+<g><rect class="pill" x="121" y="112" width="119" height="24" rx="12"/><text class="lbl" x="180" y="127.8" text-anchor="middle" font-size="10.5">page.search("…")</text></g>
+<polyline class="edge" points="260,188 409.0,188.0"/>
+<polygon class="edge-head" points="420,188 409.0,192.5 409.0,183.5"/>
+<g><rect class="pill" x="290" y="160" width="100" height="24" rx="12"/><text class="lbl" x="340" y="175.8" text-anchor="middle" font-size="10.5">findElement()</text></g>
+<polyline class="edge" points="420,236 569.0,236.0"/>
+<polygon class="edge-head" points="580,236 569.0,240.5 569.0,231.5"/>
+<g><rect class="pill" x="444" y="191" width="112" height="38" rx="19"/><text class="lbl" x="500" y="206.8" text-anchor="middle" font-size="10.5">healed selector</text><text class="lbl" x="500" y="220.7" text-anchor="middle" font-size="10.5">for this field?</text></g>
+<polyline class="edge reply" points="580,284 431.0,284.0"/>
+<polygon class="edge-head" points="420,284 431.0,279.5 431.0,288.5"/>
+<g><rect class="pill" x="434" y="256" width="131" height="24" rx="12"/><text class="lbl" x="500" y="271.8" text-anchor="middle" font-size="10.5">yes → try it first</text></g>
+<polyline class="edge" points="420,332 446,332 446,364 431.0,364.0"/>
+<polygon class="edge-head" points="420,364 431.0,359.5 431.0,368.5"/>
+<g><rect class="pill" x="355" y="300" width="157" height="24" rx="12"/><text class="lbl" x="433" y="315.8" text-anchor="middle" font-size="10.5">default @FindBy lookup</text></g>
+<polyline class="edge reply" points="420,380 446,380 446,412 431.0,412.0"/>
+<polygon class="edge-head" points="420,412 431.0,407.5 431.0,416.5"/>
+<g><rect class="pill" x="355" y="348" width="157" height="24" rx="12"/><text class="lbl" x="433" y="363.8" text-anchor="middle" font-size="10.5">NoSuchElementException</text></g>
+<polyline class="edge" points="420,428 729.0,428.0"/>
+<polygon class="edge-head" points="740,428 729.0,432.5 729.0,423.5"/>
+<g><rect class="pill" x="511" y="383" width="138" height="38" rx="19"/><text class="lbl" x="580" y="398.8" text-anchor="middle" font-size="10.5">heal(driver, field,</text><text class="lbl" x="580" y="412.7" text-anchor="middle" font-size="10.5">cause)</text></g>
+<polyline class="edge" points="740,476 889.0,476.0"/>
+<polygon class="edge-head" points="900,476 889.0,480.5 889.0,471.5"/>
+<g><rect class="pill" x="729" y="424" width="182" height="52" rx="26"/><text class="lbl" x="820" y="439.9" text-anchor="middle" font-size="10.5">POST chat payload</text><text class="lbl" x="820" y="453.8" text-anchor="middle" font-size="10.5">(system prompt + page HTML</text><text class="lbl" x="820" y="467.6" text-anchor="middle" font-size="10.5">+ description)</text></g>
+<polyline class="edge" points="900,524 1049.0,524.0"/>
+<polygon class="edge-head" points="1060,524 1049.0,528.5 1049.0,519.5"/>
+<g><rect class="pill" x="886" y="479" width="188" height="38" rx="19"/><text class="lbl" x="980" y="494.8" text-anchor="middle" font-size="10.5">HTTP (30s timeout,</text><text class="lbl" x="980" y="508.7" text-anchor="middle" font-size="10.5">retry 429/5xx with backoff)</text></g>
+<polyline class="edge reply" points="1060,572 911.0,572.0"/>
+<polygon class="edge-head" points="900,572 911.0,567.5 911.0,576.5"/>
+<g><rect class="pill" x="927" y="527" width="106" height="38" rx="19"/><text class="lbl" x="980" y="542.9" text-anchor="middle" font-size="10.5">CSS selector +</text><text class="lbl" x="980" y="556.7" text-anchor="middle" font-size="10.5">token usage</text></g>
+<polyline class="edge reply" points="900,620 751.0,620.0"/>
+<polygon class="edge-head" points="740,620 751.0,615.5 751.0,624.5"/>
+<g><rect class="pill" x="786" y="592" width="68" height="24" rx="12"/><text class="lbl" x="820" y="607.8" text-anchor="middle" font-size="10.5">selector</text></g>
+<polyline class="edge" points="740,668 1209.0,668.0"/>
+<polygon class="edge-head" points="1220,668 1209.0,672.5 1209.0,663.5"/>
+<g><rect class="pill" x="908" y="623" width="144" height="38" rx="19"/><text class="lbl" x="980" y="638.9" text-anchor="middle" font-size="10.5">logHealCall(element,</text><text class="lbl" x="980" y="652.7" text-anchor="middle" font-size="10.5">model, tokens, $)</text></g>
+<polyline class="edge" points="740,716 431.0,716.0"/>
+<polygon class="edge-head" points="420,716 431.0,711.5 431.0,720.5"/>
+<g><rect class="pill" x="508" y="671" width="144" height="38" rx="19"/><text class="lbl" x="580" y="686.9" text-anchor="middle" font-size="10.5">retry findElement</text><text class="lbl" x="580" y="700.7" text-anchor="middle" font-size="10.5">with healed selector</text></g>
+<polyline class="edge" points="420,764 569.0,764.0"/>
+<polygon class="edge-head" points="580,764 569.0,768.5 569.0,759.5"/>
+<g><rect class="pill" x="425" y="736" width="150" height="24" rx="12"/><text class="lbl" x="500" y="751.8" text-anchor="middle" font-size="10.5">store healed selector</text></g>
+<polyline class="edge reply" points="420,812 271.0,812.0"/>
+<polygon class="edge-head" points="260,812 271.0,807.5 271.0,816.5"/>
+<g><rect class="pill" x="300" y="784" width="81" height="24" rx="12"/><text class="lbl" x="340" y="799.8" text-anchor="middle" font-size="10.5">WebElement</text></g>
+<g class="node role-cloud" style="animation-delay:0.61s"><rect class="box" x="430" y="839" width="300" height="66" rx="8" stroke-width="1.8"/><text x="580" y="861.4" text-anchor="middle" font-size="11">If the healed selector also fails,</text><text x="580" y="876.0" text-anchor="middle" font-size="11">the ORIGINAL NoSuchElementException</text><text x="580" y="890.5" text-anchor="middle" font-size="11">is rethrown (healing error suppressed).</text></g>
+</svg>

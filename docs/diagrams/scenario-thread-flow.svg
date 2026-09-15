@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Original Mermaid source:
+# file: docs/ARCHITECTURE.md
+# section: ## One scenario, one browser, one thread
+# type: flowchart TD
+flowchart TD
+    subgraph thread [One TestNG thread]
+        TL[ThreadLocal slot]
+        D1[ChromeDriver A]
+        D2[ChromeDriver B]
+        TL -.->|scenario 1| D1
+        TL -.->|scenario 2| D2
+    end
+    note[quit() clears the slot<br/>before closing the browser]
+
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 354" role="img">
+<title>One scenario, one browser, one thread — flowchart</title>
+<style>
+text{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.node{animation:node-in .6s cubic-bezier(.22,.61,.36,1) both}
+@keyframes node-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.edge{fill:none;stroke:#64748b;stroke-width:1.8;stroke-dasharray:7 5;animation:dash-flow 2.6s linear infinite}
+.edge.reply{stroke-dasharray:2 5}
+.edge-head{fill:#64748b;stroke:none}
+@keyframes dash-flow{to{stroke-dashoffset:-24}}
+.lifeline{stroke:#a8a29e;stroke-width:1.2;stroke-dasharray:5 5;opacity:.55}
+.body{stroke-width:1.8}
+.r-client .body{fill:#ecfeff;stroke:#0891b2}.r-client text{fill:#164e63}
+.r-service .body{fill:#ecfdf5;stroke:#059669}.r-service text{fill:#064e3b}
+.r-data .body{fill:#f5f3ff;stroke:#7c3aed}.r-data text{fill:#4c1d95}
+.r-cloud .body{fill:#fffbeb;stroke:#d97706}.r-cloud text{fill:#78350f}
+.r-security .body{fill:#fff1f2;stroke:#e11d48}.r-security text{fill:#881337}
+.r-neutral .body{fill:#fafaf9;stroke:#a8a29e}.r-neutral text{fill:#1c1917}
+.subgraph{fill:none;stroke:#a8a29e;stroke-width:1.5;stroke-dasharray:8 5}
+.subgraph-title{fill:#57534e;font-size:11px}
+.pill rect{fill:#ffffff;stroke:#a8a29e;stroke-width:1.2}
+.pill text{fill:#1c1917;font-size:11px}
+.pill.note rect{fill:#fffbeb;stroke:#d97706}
+.pill.note text{fill:#78350f}
+@media (prefers-reduced-motion:reduce){.node,.edge{animation:none!important}}
+@media (prefers-color-scheme:dark){
+.edge{stroke:#94a3b8}.edge-head{fill:#94a3b8}
+.lifeline{stroke:#475569}
+.subgraph{stroke:#64748b}.subgraph-title{fill:#94a3b8}
+.r-client .body{fill:#083344;stroke:#22d3ee}.r-client text{fill:#a5f3fc}
+.r-service .body{fill:#022c22;stroke:#34d399}.r-service text{fill:#a7f3d0}
+.r-data .body{fill:#2e1065;stroke:#a78bfa}.r-data text{fill:#ddd6fe}
+.r-cloud .body{fill:#451a03;stroke:#fbbf24}.r-cloud text{fill:#fde68a}
+.r-security .body{fill:#4c0519;stroke:#fb7185}.r-security text{fill:#fecdd3}
+.r-neutral .body{fill:#1e293b;stroke:#64748b}.r-neutral text{fill:#e2e8f0}
+.pill rect{fill:#1e293b;stroke:#475569}.pill text{fill:#e2e8f0}
+.pill.note rect{fill:#451a03;stroke:#fbbf24}.pill.note text{fill:#fde68a}
+}
+</style>
+<g class="node" style="animation-delay:0.0s"><rect class="subgraph" x="20.0" y="16.0" width="420.0" height="234.0" rx="12"/><text class="subgraph-title" x="40.0" y="42.0">One TestNG thread</text></g>
+<g class="node r-data" style="animation-delay:0.05s"><rect class="body" x="145.0" y="64.0" width="170.0" height="48.0" rx="8"/><text x="230.0" y="92.0" text-anchor="middle" font-size="11">ThreadLocal slot</text></g>
+<g class="node r-client" style="animation-delay:0.12s"><rect class="body" x="65.0" y="160.0" width="150.0" height="48.0" rx="8"/><text x="140.0" y="188.0" text-anchor="middle" font-size="11">ChromeDriver A</text></g>
+<g class="node r-client" style="animation-delay:0.19s"><rect class="body" x="245.0" y="160.0" width="150.0" height="48.0" rx="8"/><text x="320.0" y="188.0" text-anchor="middle" font-size="11">ChromeDriver B</text></g>
+<path class="edge reply" d="M 230.0 112.0 L 140.0 160.0"/>
+<polygon class="edge-head" points="140.0,160.0 146.7,151.2 151.0,159.4"/>
+<g class="pill node" style="animation-delay:0.68s"><rect x="141.5" y="125.0" width="87.0" height="22.0" rx="11"/><text x="185.0" y="140.0" text-anchor="middle">scenario 1</text></g>
+<path class="edge reply" d="M 230.0 112.0 L 320.0 160.0"/>
+<polygon class="edge-head" points="320.0,160.0 309.0,159.4 313.3,151.2"/>
+<g class="pill node" style="animation-delay:0.68s"><rect x="231.5" y="125.0" width="87.0" height="22.0" rx="11"/><text x="275.0" y="140.0" text-anchor="middle">scenario 2</text></g>
+<g class="pill note node" style="animation-delay:0.26s"><rect x="128.9" y="290" width="202.2" height="48" rx="14"/><text x="230" y="310" text-anchor="middle">quit() clears the slot</text><text x="230" y="325" text-anchor="middle">before closing the browser</text></g>
+</svg>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Original Mermaid source:
+# file: docs/ARCHITECTURE.md
+# section: ## One scenario, one browser, one thread
+# type: sequenceDiagram
+sequenceDiagram
+    participant FSF as Failsafe fork (JVM)
+    participant TN as TestNG thread
+    participant SU as Setup @Before
+    participant DM as DriverManager<br/>(ThreadLocal)
+    participant ST as Step definitions
+    participant TD as TearDown @After
+
+    FSF->>TN: run scenario
+    TN->>SU: setWebDriver()
+    SU->>SU: WebDriverManager resolves driver binary
+    SU->>SU: new ChromeDriver / FirefoxDriver<br/>(headless + no-sandbox when needed)
+    SU->>DM: set(driver)
+    TN->>ST: execute steps
+    ST->>DM: get() → this thread's driver
+    TN->>TD: quitDriver(scenario)
+    TD->>TD: screenshot on failure
+    TD->>DM: quit() in finally<br/>(remove ThreadLocal first,<br/>then driver.quit())
+
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 640" role="img">
+<title>One scenario, one browser, one thread — sequence</title>
+<style>
+text{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.node{animation:node-in .6s cubic-bezier(.22,.61,.36,1) both}
+@keyframes node-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.edge{fill:none;stroke:#64748b;stroke-width:1.8;stroke-dasharray:7 5;animation:dash-flow 2.6s linear infinite}
+.edge.reply{stroke-dasharray:2 5}
+.edge-head{fill:#64748b;stroke:none}
+@keyframes dash-flow{to{stroke-dashoffset:-24}}
+.lifeline{stroke:#a8a29e;stroke-width:1.2;stroke-dasharray:5 5;opacity:.55}
+.body{stroke-width:1.8}
+.r-client .body{fill:#ecfeff;stroke:#0891b2}.r-client text{fill:#164e63}
+.r-service .body{fill:#ecfdf5;stroke:#059669}.r-service text{fill:#064e3b}
+.r-data .body{fill:#f5f3ff;stroke:#7c3aed}.r-data text{fill:#4c1d95}
+.r-cloud .body{fill:#fffbeb;stroke:#d97706}.r-cloud text{fill:#78350f}
+.r-security .body{fill:#fff1f2;stroke:#e11d48}.r-security text{fill:#881337}
+.r-neutral .body{fill:#fafaf9;stroke:#a8a29e}.r-neutral text{fill:#1c1917}
+.subgraph{fill:none;stroke:#a8a29e;stroke-width:1.5;stroke-dasharray:8 5}
+.subgraph-title{fill:#57534e;font-size:11px}
+.pill rect{fill:#ffffff;stroke:#a8a29e;stroke-width:1.2}
+.pill text{fill:#1c1917;font-size:11px}
+.pill.note rect{fill:#fffbeb;stroke:#d97706}
+.pill.note text{fill:#78350f}
+@media (prefers-reduced-motion:reduce){.node,.edge{animation:none!important}}
+@media (prefers-color-scheme:dark){
+.edge{stroke:#94a3b8}.edge-head{fill:#94a3b8}
+.lifeline{stroke:#475569}
+.subgraph{stroke:#64748b}.subgraph-title{fill:#94a3b8}
+.r-client .body{fill:#083344;stroke:#22d3ee}.r-client text{fill:#a5f3fc}
+.r-service .body{fill:#022c22;stroke:#34d399}.r-service text{fill:#a7f3d0}
+.r-data .body{fill:#2e1065;stroke:#a78bfa}.r-data text{fill:#ddd6fe}
+.r-cloud .body{fill:#451a03;stroke:#fbbf24}.r-cloud text{fill:#fde68a}
+.r-security .body{fill:#4c0519;stroke:#fb7185}.r-security text{fill:#fecdd3}
+.r-neutral .body{fill:#1e293b;stroke:#64748b}.r-neutral text{fill:#e2e8f0}
+.pill rect{fill:#1e293b;stroke:#475569}.pill text{fill:#e2e8f0}
+.pill.note rect{fill:#451a03;stroke:#fbbf24}.pill.note text{fill:#fde68a}
+}
+</style>
+<g class="node r-service" style="animation-delay:0.05s"><rect class="body" x="21.0" y="16.0" width="128.0" height="48.0" rx="8"/><text x="85.0" y="36.5" text-anchor="middle" font-size="11">Failsafe fork</text><text x="85.0" y="51.5" text-anchor="middle" font-size="11">(JVM)</text></g>
+<line class="lifeline" x1="85.0" y1="64.0" x2="85.0" y2="624.0"/>
+<g class="node r-client" style="animation-delay:0.12s"><rect class="body" x="191.0" y="16.0" width="128.0" height="48.0" rx="8"/><text x="255.0" y="44.0" text-anchor="middle" font-size="11">TestNG thread</text></g>
+<line class="lifeline" x1="255.0" y1="64.0" x2="255.0" y2="624.0"/>
+<g class="node r-service" style="animation-delay:0.19s"><rect class="body" x="361.0" y="16.0" width="128.0" height="48.0" rx="8"/><text x="425.0" y="36.5" text-anchor="middle" font-size="11">Setup</text><text x="425.0" y="51.5" text-anchor="middle" font-size="11">@Before</text></g>
+<line class="lifeline" x1="425.0" y1="64.0" x2="425.0" y2="624.0"/>
+<g class="node r-data" style="animation-delay:0.26s"><rect class="body" x="531.0" y="16.0" width="128.0" height="48.0" rx="8"/><text x="595.0" y="36.5" text-anchor="middle" font-size="11">DriverManager</text><text x="595.0" y="51.5" text-anchor="middle" font-size="11">(ThreadLocal)</text></g>
+<line class="lifeline" x1="595.0" y1="64.0" x2="595.0" y2="624.0"/>
+<g class="node r-client" style="animation-delay:0.33s"><rect class="body" x="701.0" y="16.0" width="128.0" height="48.0" rx="8"/><text x="765.0" y="44.0" text-anchor="middle" font-size="11">Step definitions</text></g>
+<line class="lifeline" x1="765.0" y1="64.0" x2="765.0" y2="624.0"/>
+<g class="node r-security" style="animation-delay:0.4s"><rect class="body" x="871.0" y="16.0" width="128.0" height="48.0" rx="8"/><text x="935.0" y="36.5" text-anchor="middle" font-size="11">TearDown</text><text x="935.0" y="51.5" text-anchor="middle" font-size="11">@After</text></g>
+<line class="lifeline" x1="935.0" y1="64.0" x2="935.0" y2="624.0"/>
+<path class="edge" d="M 149.0 112.0 L 191.0 112.0"/>
+<polygon class="edge-head" points="191.0,112.0 181.0,116.6 181.0,107.4"/>
+<g class="pill node" style="animation-delay:0.68s"><rect x="119.8" y="74.0" width="100.4" height="22.0" rx="11"/><text x="170.0" y="89.0" text-anchor="middle">run scenario</text></g>
+<path class="edge" d="M 319.0 160.0 L 361.0 160.0"/>
+<polygon class="edge-head" points="361.0,160.0 351.0,164.6 351.0,155.4"/>
+<g class="pill node" style="animation-delay:0.68s"><rect x="283.1" y="122.0" width="113.8" height="22.0" rx="11"/><text x="340.0" y="137.0" text-anchor="middle">setWebDriver()</text></g>
+<path class="edge" d="M 489 208 L 525 208 L 525 232 L 489 232"/>
+<polygon class="edge-head" points="489.0,232.0 499.0,227.4 499.0,236.6"/>
+<g class="pill node" style="animation-delay:0.68s"><rect x="413.2" y="171.5" width="187.5" height="37.0" rx="11"/><text x="507.0" y="186.5" text-anchor="middle">WebDriverManager resolves</text><text x="507.0" y="201.5" text-anchor="middle">driver binary</text></g>
+<path class="edge" d="M 489 272 L 525 272 L 525 296 L 489 296"/>
+<polygon class="edge-head" points="489.0,296.0 499.0,291.4 499.0,300.6"/>
+<g class="pill node" style="animation-delay:0.68s"><rect x="379.8" y="235.5" width="254.5" height="37.0" rx="11"/><text x="507.0" y="250.5" text-anchor="middle">new ChromeDriver / FirefoxDriver</text><text x="507.0" y="265.5" text-anchor="middle">(headless + no-sandbox when needed)</text></g>
+<path class="edge" d="M 489.0 336.0 L 531.0 336.0"/>
+<polygon class="edge-head" points="531.0,336.0 521.0,340.6 521.0,331.4"/>
+<g class="pill node" style="animation-delay:0.68s"><rect x="463.1" y="298.0" width="93.7" height="22.0" rx="11"/><text x="510.0" y="313.0" text-anchor="middle">set(driver)</text></g>
+<path class="edge" d="M 319.0 384.0 L 701.0 384.0"/>
+<polygon class="edge-head" points="701.0,384.0 691.0,388.6 691.0,379.4"/>
+<g class="pill node" style="animation-delay:0.68s"><rect x="456.4" y="346.0" width="107.1" height="22.0" rx="11"/><text x="510.0" y="361.0" text-anchor="middle">execute steps</text></g>
+<path class="edge" d="M 701.0 432.0 L 659.0 432.0"/>
+<polygon class="edge-head" points="659.0,432.0 669.0,427.4 669.0,436.6"/>
+<g class="pill node" style="animation-delay:0.68s"><rect x="576.2" y="394.0" width="207.6" height="22.0" rx="11"/><text x="680.0" y="409.0" text-anchor="middle">get() → this thread's driver</text></g>
+<path class="edge" d="M 319.0 480.0 L 871.0 480.0"/>
+<polygon class="edge-head" points="871.0,480.0 861.0,484.6 861.0,475.4"/>
+<g class="pill node" style="animation-delay:0.68s"><rect x="518.0" y="442.0" width="154.0" height="22.0" rx="11"/><text x="595.0" y="457.0" text-anchor="middle">quitDriver(scenario)</text></g>
+<path class="edge" d="M 999 528 L 1029 528 L 1029 552 L 999 552"/>
+<polygon class="edge-head" points="999.0,552.0 1009.0,547.4 1009.0,556.6"/>
+<g class="pill node" style="animation-delay:0.68s"><rect x="933.6" y="490.0" width="160.7" height="22.0" rx="11"/><text x="1014.0" y="505.0" text-anchor="middle">screenshot on failure</text></g>
+<path class="edge" d="M 871.0 592.0 L 659.0 592.0"/>
+<polygon class="edge-head" points="659.0,592.0 669.0,587.4 669.0,596.6"/>
+<g class="pill node" style="animation-delay:0.68s"><rect x="667.9" y="533.0" width="194.2" height="52.0" rx="11"/><text x="765.0" y="548.0" text-anchor="middle">quit() in finally</text><text x="765.0" y="563.0" text-anchor="middle">(remove ThreadLocal first,</text><text x="765.0" y="578.0" text-anchor="middle">then driver.quit())</text></g>
+</svg>

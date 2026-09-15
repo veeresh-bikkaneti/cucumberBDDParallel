@@ -130,17 +130,7 @@ other jobs), pass `-Dai.healing.enabled=false`.
 
 Five jobs in `.github/workflows/ci.yml`:
 
-```mermaid
-flowchart TD
-    A[push or pull_request] --> B[unit-tests]
-    B --> H[ai-healing-demo]
-    B --> W[web-patterns-demo]
-    B --> C[e2e-no-ai]
-    B --> D[e2e-with-ai]
-    D --> E{AI healing credentials secret set?}
-    E -->|No| F[skip, note in job summary]
-    E -->|Yes| G[run with healing, log cost to job summary]
-```
+![Playbook: CI job fan-out](docs/diagrams/playbook-ci.svg)
 
 - **unit-tests** - `framework`'s JUnit 5 suite. No browser, no
   network, fast. Gates the other four jobs.
@@ -158,29 +148,7 @@ flowchart TD
 
 ## How a healing call actually works end to end
 
-```mermaid
-sequenceDiagram
-    participant Step as Step definition
-    participant Page as Page object
-    participant Locator as SelfHealingElementLocator
-    participant Healer as AiLocatorHealer
-    participant Client as LlmMessagesClient
-    participant API as Configured LLM API
-    participant Cost as CostLogger
-
-    Step->>Page: call page method
-    Page->>Locator: findElement()
-    Locator->>Locator: try the default lookup
-    Locator-->>Locator: NoSuchElementException
-    Locator->>Healer: heal(driver, field name, exception)
-    Healer->>Client: send(system prompt, page HTML + description)
-    Client->>API: POST /v1/messages
-    API-->>Client: selector text + token usage
-    Client-->>Healer: LlmResponse
-    Healer->>Cost: logHealCall(element, model, usage)
-    Healer->>Healer: parse selector, retry findElement
-    Healer-->>Page: WebElement
-```
+![How a healing call works end to end](docs/diagrams/healing-call-sequence.svg)
 
 If the retried lookup also fails, the original
 `NoSuchElementException` is rethrown with the healing failure attached

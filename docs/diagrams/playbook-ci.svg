@@ -1,0 +1,82 @@
+<!--
+Original Mermaid source:
+# file: PLAYBOOK.md
+# section: ## CI
+# type: flowchart TD
+flowchart TD
+    A[push or pull_request] - -> B[unit-tests]
+    B - -> H[ai-healing-demo]
+    B - -> W[web-patterns-demo]
+    B - -> C[e2e-no-ai]
+    B - -> D[e2e-with-ai]
+    D - -> E{AI healing credentials secret set?}
+    E - ->|No| F[skip, note in job summary]
+    E - ->|Yes| G[run with healing, log cost to job summary]
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 660" role="img">
+<title>CI pipeline playbook</title>
+<style>
+text{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.node{animation:node-in .6s cubic-bezier(.22,.61,.36,1) both}
+@keyframes node-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.edge{fill:none;stroke:#64748b;stroke-width:1.8;stroke-dasharray:7 5;animation:dash-flow 2.6s linear infinite}
+.edge.reply{stroke-dasharray:2 5}
+.edge-head{fill:#64748b;stroke:none}
+@keyframes dash-flow{to{stroke-dashoffset:-24}}
+.lifeline{stroke:#a8a29e;stroke-width:1.2;stroke-dasharray:5 5;opacity:.55}
+.body{stroke-width:1.8}
+.r-client .body{fill:#ecfeff;stroke:#0891b2}.r-client text{fill:#164e63}
+.r-service .body{fill:#ecfdf5;stroke:#059669}.r-service text{fill:#064e3b}
+.r-data .body{fill:#f5f3ff;stroke:#7c3aed}.r-data text{fill:#4c1d95}
+.r-cloud .body{fill:#fffbeb;stroke:#d97706}.r-cloud text{fill:#78350f}
+.r-security .body{fill:#fff1f2;stroke:#e11d48}.r-security text{fill:#881337}
+.r-neutral .body{fill:#fafaf9;stroke:#a8a29e}.r-neutral text{fill:#1c1917}
+.subgraph{fill:none;stroke:#a8a29e;stroke-width:1.5;stroke-dasharray:8 5}
+.subgraph-title{fill:#57534e;font-size:11px}
+.pill rect{fill:#ffffff;stroke:#a8a29e;stroke-width:1.2}
+.pill text{fill:#1c1917;font-size:11px}
+.pill.note rect{fill:#fffbeb;stroke:#d97706}
+.pill.note text{fill:#78350f}
+@media (prefers-reduced-motion:reduce){.node,.edge{animation:none!important}}
+@media (prefers-color-scheme:dark){
+.edge{stroke:#94a3b8}.edge-head{fill:#94a3b8}
+.lifeline{stroke:#475569}
+.subgraph{stroke:#64748b}.subgraph-title{fill:#94a3b8}
+.r-client .body{fill:#083344;stroke:#22d3ee}.r-client text{fill:#a5f3fc}
+.r-service .body{fill:#022c22;stroke:#34d399}.r-service text{fill:#a7f3d0}
+.r-data .body{fill:#2e1065;stroke:#a78bfa}.r-data text{fill:#ddd6fe}
+.r-cloud .body{fill:#451a03;stroke:#fbbf24}.r-cloud text{fill:#fde68a}
+.r-security .body{fill:#4c0519;stroke:#fb7185}.r-security text{fill:#fecdd3}
+.r-neutral .body{fill:#1e293b;stroke:#64748b}.r-neutral text{fill:#e2e8f0}
+.pill rect{fill:#1e293b;stroke:#475569}.pill text{fill:#e2e8f0}
+.pill.note rect{fill:#451a03;stroke:#fbbf24}.pill.note text{fill:#fde68a}
+}
+</style>
+<g class="node r-cloud" style="animation-delay:0.05s"><rect class="body" x="300" y="30" width="260" height="48" rx="24"/><text x="430.0" y="57.9" text-anchor="middle" font-size="11">push or pull_request</text></g>
+<g class="node r-service" style="animation-delay:0.12s"><rect class="body" x="320" y="130" width="220" height="48" rx="8"/><text x="430.0" y="157.8" text-anchor="middle" font-size="11">unit-tests</text></g>
+<path class="edge" d="M 430.0 78.0 L 430.0 130.0"/>
+<polygon class="edge-head" points="430.0,130.0 425.4,120.0 434.6,120.0"/>
+<g class="node r-service" style="animation-delay:0.19s"><rect class="body" x="30" y="250" width="200" height="52" rx="8"/><text x="130.0" y="279.9" text-anchor="middle" font-size="11">ai-healing-demo</text></g>
+<g class="node r-service" style="animation-delay:0.26s"><rect class="body" x="270" y="250" width="200" height="52" rx="8"/><text x="370.0" y="279.9" text-anchor="middle" font-size="11">web-patterns-demo</text></g>
+<g class="node r-service" style="animation-delay:0.33s"><rect class="body" x="510" y="250" width="180" height="52" rx="8"/><text x="600.0" y="279.9" text-anchor="middle" font-size="11">e2e-no-ai</text></g>
+<g class="node r-service" style="animation-delay:0.40s"><rect class="body" x="730" y="250" width="200" height="52" rx="8"/><text x="830.0" y="279.9" text-anchor="middle" font-size="11">e2e-with-ai</text></g>
+<path class="edge" d="M 430 178 L 430 214 L 130 214 L 130 250"/>
+<polygon class="edge-head" points="130.0,250.0 125.4,240.0 134.6,240.0"/>
+<path class="edge" d="M 430 178 L 430 214 L 370 214 L 370 250"/>
+<polygon class="edge-head" points="370.0,250.0 365.4,240.0 374.6,240.0"/>
+<path class="edge" d="M 430 178 L 430 214 L 600 214 L 600 250"/>
+<polygon class="edge-head" points="600.0,250.0 595.4,240.0 604.6,240.0"/>
+<path class="edge" d="M 430 178 L 430 214 L 830 214 L 830 250"/>
+<polygon class="edge-head" points="830.0,250.0 825.4,240.0 834.6,240.0"/>
+<path class="edge" d="M 830.0 302.0 L 830.0 360.0"/>
+<polygon class="edge-head" points="830.0,360.0 825.4,350.0 834.6,350.0"/>
+<g class="node r-security" style="animation-delay:0.47s"><polygon class="body" points="830.0,360.0 950.0,420.0 830.0,480.0 710.0,420.0"/><text x="830.0" y="412.0" text-anchor="middle" font-size="11">AI healing credentials</text><text x="830.0" y="427.0" text-anchor="middle" font-size="11">secret set?</text></g>
+<g class="node r-neutral" style="animation-delay:0.54s"><rect class="body" x="400" y="560" width="260" height="56" rx="8"/><text x="530.0" y="591.9" text-anchor="middle" font-size="11">skip, note in job summary</text></g>
+<g class="node r-service" style="animation-delay:0.61s"><rect class="body" x="780" y="560" width="300" height="56" rx="8"/><text x="930.0" y="584.4" text-anchor="middle" font-size="11">run with healing,</text><text x="930.0" y="599.4" text-anchor="middle" font-size="11">log cost to job summary</text></g>
+<path class="edge" d="M 710 420 L 530 420 L 530 560"/>
+<polygon class="edge-head" points="530.0,560.0 525.4,550.0 534.6,550.0"/>
+<g class="pill node" style="animation-delay:0.68s"><rect x="603.3" y="397.0" width="33.4" height="22" rx="11"/><text x="620.0" y="412.0" text-anchor="middle" font-size="11">No</text></g>
+<path class="edge" d="M 950 420 L 930 420 L 930 560"/>
+<polygon class="edge-head" points="930.0,560.0 925.4,550.0 934.6,550.0"/>
+<g class="pill node" style="animation-delay:0.68s"><rect x="910.0" y="479.0" width="40.1" height="22" rx="11"/><text x="930.0" y="494.0" text-anchor="middle" font-size="11">Yes</text></g>
+</svg>
