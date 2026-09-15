@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Example App - Home</title>
+  <style>
+    body { font-family: sans-serif; max-width: 640px; margin: 2rem auto; }
+    #logo { font-size: 2rem; font-weight: bold; }
+    nav a { margin-right: 1rem; }
+    #search-box { width: 300px; padding: 0.4rem; }
+  </style>
+</head>
+<body>
+  <div id="logo">Example App</div>
+  <p>A tiny self-contained demo site for practicing Selenium and Cucumber.</p>
+
+  <form action="/search" method="get">
+    <input id="search-box" name="q" type="text" placeholder="Search the example app...">
+    <button id="search-button" type="submit">Search</button>
+  </form>
+
+  <nav>
+    <a id="nav-tables" href="/tables">Tables</a>
+    <a id="nav-drag-drop" href="/drag-drop">Drag &amp; Drop</a>
+    <a id="nav-upload" href="/upload">Upload</a>
+    <a id="nav-login" href="/login">Login</a>
+    <a id="nav-dynamic" href="/dynamic">Dynamic content</a>
+  </nav>
+</body>
+</html>

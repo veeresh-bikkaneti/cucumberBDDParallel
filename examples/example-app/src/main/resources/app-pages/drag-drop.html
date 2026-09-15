@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Drag and drop - Example App</title>
+  <style>
+    body { font-family: sans-serif; max-width: 640px; margin: 2rem auto; }
+    #drag-source { width: 120px; padding: 1rem; background: #e3f2fd; border: 2px solid #1976d2;
+                   cursor: grab; text-align: center; }
+    #drop-target { width: 200px; height: 120px; border: 2px dashed #999; margin-top: 1rem;
+                   display: flex; align-items: center; justify-content: center; }
+  </style>
+</head>
+<body>
+  <h1>Drag and drop</h1>
+  <div id="drag-source" draggable="true">Drag me</div>
+  <div id="drop-target">Drop here</div>
+  <p id="drop-status">Waiting for drop…</p>
+  <script>
+    var source = document.getElementById('drag-source');
+    var target = document.getElementById('drop-target');
+    var status = document.getElementById('drop-status');
+    // Remembered on dragstart as a fallback: synthetic DragEvents built by test
+    // helpers sometimes carry a DataTransfer that survives the round trip, sometimes
+    // not - either way the drop handler resolves the source id.
+    var draggedId = null;
+
+    source.addEventListener('dragstart', function (e) {
+      draggedId = source.id;
+      if (e.dataTransfer) {
+        e.dataTransfer.setData('text/plain', source.id);
+        e.dataTransfer.effectAllowed = 'move';
+      }
+    });
+
+    target.addEventListener('dragover', function (e) {
+      // Required: without preventDefault the drop event never fires.
+      e.preventDefault();
+      if (e.dataTransfer) {
+        e.dataTransfer.dropEffect = 'move';
+      }
+    });
+
+    target.addEventListener('drop', function (e) {
+      e.preventDefault();
+      var id = draggedId;
+      if (e.dataTransfer) {
+        try {
+          var fromData = e.dataTransfer.getData('text/plain');
+          if (fromData) {
+            id = fromData;
+          }
+        } catch (err) {
+          // Some synthetic DataTransfer shims throw on getData - fall back to dragstart.
+        }
+      }
+      status.textContent = 'Dropped: ' + id;
+    });
+
+    source.addEventListener('dragend', function () {
+      draggedId = null;
+    });
+  </script>
+</body>
+</html>

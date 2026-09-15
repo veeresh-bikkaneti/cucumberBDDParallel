@@ -88,7 +88,7 @@ OCR (needs Tesseract inside the image):
 docker compose --profile ocr run --rm cucumber-examples-ocr
 ```
 
-Full `example-tests` integration (local fixtures, headless Chrome):
+Full `example-tests` integration (self-contained example app, headless Chrome):
 
 ```bash
 docker compose --profile integration run --rm cucumber-integration

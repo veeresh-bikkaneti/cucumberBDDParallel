@@ -30,6 +30,7 @@
         <module>example-tests</module>
         <module>examples/ai-healing-demo</module>
         <module>examples/web-patterns-demo</module>
+        <module>examples/example-app</module>
     </modules>
 
     <properties>

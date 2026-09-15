@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Employee table - Example App</title>
+  <style>
+    body { font-family: sans-serif; max-width: 640px; margin: 2rem auto; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
+    th { background: #f0f0f0; }
+  </style>
+</head>
+<body>
+  <h1>Employees</h1>
+  <button id="sort-salary" type="button">Sort by salary</button>
+  <table id="employees">
+    <thead>
+      <tr><th>Name</th><th>Department</th><th>Salary</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Alice Rao</td><td>Engineering</td><td>95000</td></tr>
+      <tr><td>Ben Carter</td><td>Marketing</td><td>62000</td></tr>
+      <tr><td>Cara Diaz</td><td>Engineering</td><td>110000</td></tr>
+      <tr><td>Dev Patel</td><td>Support</td><td>54000</td></tr>
+      <tr><td>Eva Novak</td><td>Marketing</td><td>78000</td></tr>
+    </tbody>
+  </table>
+  <script>
+    document.getElementById('sort-salary').addEventListener('click', function () {
+      var tbody = document.querySelector('#employees tbody');
+      var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
+      rows.sort(function (a, b) {
+        return Number(a.cells[2].textContent) - Number(b.cells[2].textContent);
+      });
+      rows.forEach(function (row) { tbody.appendChild(row); });
+    });
+  </script>
+</body>
+</html>

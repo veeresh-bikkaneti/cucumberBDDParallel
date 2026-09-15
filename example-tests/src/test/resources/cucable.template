@@ -11,7 +11,12 @@ plugin = {"json:target/cucumber-report/[CUCABLE:RUNNER].json"},
 glue = {"com.cucumberbddparallel.framework.driver",
                        "com.cucumberbddparallel.example.support",
                        "com.cucumberbddparallel.example.homepage",
-                       "com.cucumberbddparallel.example.searchresultpage"})
+                       "com.cucumberbddparallel.example.searchresultpage",
+                       "com.cucumberbddparallel.example.dynamicloading",
+                       "com.cucumberbddparallel.example.tables",
+                       "com.cucumberbddparallel.example.dragdrop",
+                       "com.cucumberbddparallel.example.fileupload",
+                       "com.cucumberbddparallel.example.login"})
 
 public class [CUCABLE:RUNNER] extends AbstractTestNGCucumberTests {
 }

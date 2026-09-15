@@ -9,40 +9,45 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import java.util.List;
-import java.util.stream.IntStream;
 
-/** Page object for the example search results page - just the "is this URL in the first N results" check. */
+/**
+ * Page object for the example app's search results page ({@code /search?q=...}).
+ * Verifies the heading names the query and that the result links actually mention it.
+ */
 public class SearchResultPage extends BasePage {
 
     private static final Logger LOG = LoggerFactory.getLogger(SearchResultPage.class);
-    // The fixture (fixtures/search.html) renders each result's visible URL inside a <cite>
-    // tag - that's genuinely all we're matching against here, not the full result markup.
-    private static final String RESULTS_URL_SELECTOR = "cite";
 
-    @FindBy(css = RESULTS_URL_SELECTOR)
-    private List<WebElement> results;
+    @FindBy(css = "#results-heading")
+    private WebElement heading;
 
-    /**
-     * Public because cucumber-picocontainer instantiates page objects via constructor
-     * injection (see {@link SearchResultPageSteps}) - one instance per scenario, created
-     * lazily after the {@code @Before} hook has opened the browser.
-     */
+    @FindBy(css = ".result .result-url")
+    private List<WebElement> resultUrls;
+
+    /** Public so step classes can {@code new SearchResultPage()} in their {@code @Before} hooks. */
     public SearchResultPage() {
     }
 
-    /** True if {@code expectedUrl} shows up among the first {@code nbOfResultsToSearch} results. */
-    void checkExpectedUrlInResults(String expectedUrl, int nbOfResultsToSearch) {
-        wait.forPresenceOfElements(5, By.cssSelector(RESULTS_URL_SELECTOR), "Result url");
-        // Math.min guards against asking for more results than actually came back - without
-        // it, a search returning fewer results than expected would throw an
-        // IndexOutOfBoundsException instead of a clear assertion failure.
-        int indexOfLink = IntStream.range(0, Math.min(this.results.size(), nbOfResultsToSearch))
-                .filter(index -> expectedUrl.equals(this.results.get(index).getText()))
-                .findFirst()
-                .orElse(-1);
-        boolean found = indexOfLink != -1;
-        LOG.info("Url \"{}\" present in the first {} results: {}", expectedUrl, nbOfResultsToSearch, found);
-        Assert.assertTrue(found,
-                "Expected url \"" + expectedUrl + "\" in the first " + nbOfResultsToSearch + " results, but it was not there");
+    /** The heading reads {@code Results for "query"} - check it names the query searched for. */
+    void checkHeadingShowsQuery(String query) {
+        wait.forElementToBeDisplayed(5, this.heading, "Results heading");
+        String expected = "Results for \"" + query + "\"";
+        String actual = this.heading.getText();
+        LOG.info("Results heading: expected \"{}\", displayed \"{}\"", expected, actual);
+        Assert.assertEquals(actual, expected, "Search results heading did not name the query");
+    }
+
+    /** Every one of the first {@code count} result links should mention the query (case-insensitive - the app lowercases queries in its result URLs). */
+    void checkFirstResultLinksContainQuery(String query, int count) {
+        wait.forPresenceOfElements(5, By.cssSelector(".result .result-url"), "Result links");
+        Assert.assertTrue(this.resultUrls.size() >= count,
+                "Expected at least " + count + " results but only found " + this.resultUrls.size());
+        String lowerQuery = query.toLowerCase();
+        for (int i = 0; i < count; i++) {
+            String url = this.resultUrls.get(i).getText();
+            LOG.info("Result {} link: \"{}\"", i + 1, url);
+            Assert.assertTrue(url.toLowerCase().contains(lowerQuery),
+                    "Result " + (i + 1) + " link \"" + url + "\" does not contain \"" + query + "\"");
+        }
     }
 }

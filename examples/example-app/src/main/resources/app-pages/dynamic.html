@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Dynamic content - Example App</title>
+  <style>
+    body { font-family: sans-serif; max-width: 640px; margin: 2rem auto; }
+    #delayed-content { display: none; border: 1px solid #1a6b1a; padding: 1rem; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Dynamic content</h1>
+  <p>Clicking the button loads content after a short delay, like a real AJAX call.</p>
+  <button id="load-button" type="button">Load content</button>
+  <div id="delayed-content"></div>
+  <script>
+    document.getElementById('load-button').addEventListener('click', function () {
+      setTimeout(function () {
+        var content = document.getElementById('delayed-content');
+        content.textContent = 'Content loaded dynamically';
+        content.style.display = 'block';
+      }, 2000);
+    });
+  </script>
+</body>
+</html>

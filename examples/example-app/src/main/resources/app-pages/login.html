@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Login - Example App</title>
+  <style>
+    body { font-family: sans-serif; max-width: 640px; margin: 2rem auto; }
+    label { display: block; margin: 0.5rem 0; }
+    #welcome { margin-top: 1rem; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Login</h1>
+  <form id="login-form">
+    <label>Username <input id="username" type="text"></label>
+    <label>Password <input id="password" type="password"></label>
+    <button id="login-button" type="submit">Log in</button>
+  </form>
+  <p id="welcome"></p>
+  <script>
+    document.getElementById('login-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var username = document.getElementById('username').value;
+      document.getElementById('welcome').textContent = 'Welcome, ' + username + '!';
+    });
+  </script>
+</body>
+</html>

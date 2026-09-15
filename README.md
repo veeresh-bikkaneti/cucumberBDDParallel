@@ -12,7 +12,8 @@ shifts.
 | Module | What it is |
 |---|---|
 | `framework/` | The reusable core: driver setup/teardown, explicit waits, a base page class, web-pattern helpers, and the opt-in AI self-healing locator. Depend on this from your own test project. |
-| `example-tests/` | A working BDD suite against **local fixtures** (no live-site flake): Gherkin features, step definitions, page objects, TestNG runners, parallelized with Cucable. |
+| `example-tests/` | A working BDD suite against the self-contained example app (no live-site flake): Gherkin features, step definitions, page objects, TestNG runners, parallelized with Cucable. |
+| `examples/example-app` | The demo web app the examples drive — an embedded HTTP server (JDK only, zero dependencies) with pages for search, tables, drag-drop, upload, login, and dynamic content. See [`docs/EXAMPLE_APP.md`](docs/EXAMPLE_APP.md). |
 | `examples/ai-healing-demo` | Deterministic proof that locator healing works — a mock LLM for CI, plus live runs for Anthropic / OpenAI / Ollama. |
 | `examples/web-patterns-demo` | Recipes for tricky web patterns with local fixtures: tables, HTML5 drag-drop, file upload/download, PDF text, QR decode, OCR. |
 
@@ -119,6 +120,7 @@ reference for exactly this setup.
 | Doc | For |
 |---|---|
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Module map, parallel execution flow, scenario lifecycle, healing sequence, provider abstraction, CI and Docker topology — with diagrams |
+| [`docs/EXAMPLE_APP.md`](docs/EXAMPLE_APP.md) | The self-contained example app: routes, element IDs, server lifecycle, and which feature demonstrates which framework capability — with diagrams |
 | [`docs/AI_HEALING.md`](docs/AI_HEALING.md) | Provider setup, full env var reference, reliability behavior, cost tracking, troubleshooting |
 | [`PLAYBOOK.md`](PLAYBOOK.md) | Architecture decisions, SOLID reasoning, the AI cost model, CI internals, extending the framework |
 | [`docs/MCP_PLAYBOOK.md`](docs/MCP_PLAYBOOK.md) | Driving the fixtures with an MCP Selenium agent for exploration |

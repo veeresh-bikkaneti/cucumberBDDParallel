@@ -7,17 +7,20 @@ behind the design decisions, see the [Playbook](../PLAYBOOK.md).
 
 ## Module map
 
-Four Maven modules. One rule: **everything depends on `framework`;
+Five Maven modules. One rule: **everything depends on `framework`;
+`example-tests` also depends on the `example-app` it drives;
 nothing else depends on anything.**
 
 ```mermaid
 flowchart TD
     F[framework<br/>reusable core: driver lifecycle,<br/>waits, pages, AI healing]
-    E1[example-tests<br/>Cucumber + TestNG BDD suite<br/>against local fixtures]
+    E1[example-tests<br/>Cucumber + TestNG BDD suite<br/>against the example app]
     E2[examples/ai-healing-demo<br/>deterministic healing demo<br/>mock + live providers]
     E3[examples/web-patterns-demo<br/>tables, drag-drop, upload/download,<br/>PDF, QR, OCR]
+    E4[examples/example-app<br/>self-contained demo web app<br/>embedded server, zero dependencies]
 
     E1 --> F
+    E1 --> E4
     E2 --> F
     E3 --> F
 ```
@@ -25,7 +28,8 @@ flowchart TD
 | Module | Packaging | Depends on | Purpose |
 |---|---|---|---|
 | `framework` | jar | Selenium, Cucumber, TestNG, WebDriverManager, SLF4J | The reusable library. Driver lifecycle, explicit waits, base page, opt-in AI healing locator, cost tracking. |
-| `example-tests` | jar (test code) | `framework` | A real BDD suite: Gherkin features, step definitions, page objects, TestNG runners — parallelized with Cucable. |
+| `example-tests` | jar (test code) | `framework`, `example-app` | A real BDD suite: Gherkin features, step definitions, page objects, TestNG runners — parallelized with Cucable. The app-under-test is `example-app` (see [EXAMPLE_APP.md](EXAMPLE_APP.md)). |
+| `examples/example-app` | jar | none (JDK only) | The self-contained demo web app the examples drive: embedded `HttpServer`, teaching pages for search, tables, drag-drop, upload, login, dynamic content. Full route table in [EXAMPLE_APP.md](EXAMPLE_APP.md). |
 | `examples/ai-healing-demo` | jar (test code) | `framework` | Proves locator healing works: a deliberately broken `@FindBy`, a mock LLM for CI, live runs for Anthropic/OpenAI/Ollama. |
 | `examples/web-patterns-demo` | jar (test code) | `framework` | Tricky-web-pattern recipes with local fixtures: tables, HTML5 drag-drop, file upload/download, PDF text, QR decode, OCR. |
 
@@ -276,7 +280,8 @@ healing runs.
 | Web patterns | `framework/.../interaction/TableHelper.java`, `DragDropHelper.java`, `FileUploadHelper.java` |
 | AI healing | `framework/.../ai/AiLocatorHealer.java`, `AiElementLocatorFactory.java`, `AiConfig.java`, `AiHealingSettings.java`, `AiProvider.java`, `LlmClientFactory.java`, `LlmMessagesClient.java`, `LlmHttp.java` (shared timeout/retry), `AnthropicHttpClient.java`, `OpenAiCompatibleHttpClient.java`, `SelectorResponseParser.java`, `JsonEscaping.java` |
 | Cost tracking | `framework/.../ai/cost/CostLogger.java`, `CostCalculator.java`, `ModelPricing.java`, `TokenUsage.java` |
-| Parallel BDD | `example-tests/pom.xml` (Cucable + Failsafe), `example-tests/src/test/resources/cucable.template` |
+| Parallel BDD | `example-tests/pom.xml` (Cucable + Failsafe), `example-tests/src/test/resources/cucable.template`, `example-tests/.../support/AppServerHooks.java` (starts/stops the example app) |
+| Example app | `examples/example-app` — `ExampleAppServer.java`, `SearchPageRenderer.java`, `StaticPageHandler.java`, `src/main/resources/app-pages/*.html` |
 | Demos | `examples/ai-healing-demo`, `examples/web-patterns-demo` |
 | CI / Docker | `.github/workflows/ci.yml`, `Dockerfile`, `docker-compose.yml`, `docker-compose.ollama.yml` |
-| Docs | `README.md`, `PLAYBOOK.md`, `docs/AI_HEALING.md`, `docs/MCP_PLAYBOOK.md` |
+| Docs | `README.md`, `PLAYBOOK.md`, `docs/AI_HEALING.md`, `docs/EXAMPLE_APP.md`, `docs/MCP_PLAYBOOK.md` |

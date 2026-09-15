@@ -1,11 +1,13 @@
 Feature: Search
+  Searching from the home page shows a results page whose entries mention the query.
 
-
-  Scenario Outline: Search hiptest (uid:f553cdd4-723e-4eb8-aa9f-a6af0f3ff7e3)
-    Given A user navigates to HomePage "fr"
-    When a user searches for "hiptest"
-    Then "https://hiptest.com/" is displayed in the first "<nbOfResultsToSearch>" results
+  Scenario Outline: Search results mention the query
+    Given a user is on the example app home page
+    When the user searches for "<query>"
+    Then the results heading shows "<query>"
+    And the first <count> result links contain "<query>"
 
     Examples:
-      | nbOfResultsToSearch | hiptest-uid |
-      | 3 | uid:e46448ef-6927-407e-a69b-3baa25b75ad3 |
+      | query    | count |
+      | cucumber | 3     |
+      | selenium | 3     |

@@ -1,16 +1,11 @@
 Feature: Home page
+  The example app's landing page - the starting point for every example in this module.
 
+  Scenario: Logo and search box are displayed
+    Given a user is on the example app home page
+    Then the logo is displayed
+    And the search box is displayed
 
-  Scenario Outline: Check page display (uid:8701b6da-ae8f-40b2-a6ba-e4da58f83954)
-    Given A user navigates to HomePage "<countryCode>"
-    Then Google logo is displayed
-    And search bar is displayed
-
-    Examples:
-      | countryCode | hiptest-uid |
-      | fr | uid:f9abb2df-5669-4fec-aac8-55a189301ffe |
-      | com | uid:d980e564-90fb-4d26-9c5e-8e9ed5c50a44 |
-
-  Scenario: Check title (uid:4e9e6380-bffd-482d-9c6f-f4dd7b960398)
-    Given A user navigates to HomePage "fr"
-    Then page title is "Google"
+  Scenario: Home page title is correct
+    Given a user is on the example app home page
+    Then the page title is "Example App - Home"

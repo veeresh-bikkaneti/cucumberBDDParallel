@@ -148,8 +148,9 @@ flowchart TD
   broken-locator → mock LLM → healed test. No API key needed.
 - **web-patterns-demo** - tables, drag-drop, upload/download, PDF, QR
   against local fixtures in headless Chrome.
-- **e2e-no-ai** - the example BDD suite against local fixtures with
-  no AI healing. Proves the framework works standalone.
+- **e2e-no-ai** - the example BDD suite against the self-contained
+  example app with no AI healing. Proves the framework works
+  standalone.
 - **e2e-with-ai** - same suite, with AI healing credentials from a repo
   secret (`ANTHROPIC_API_KEY` or unified `AI_HEALING_*` vars). Skips
   itself gracefully when the secret isn't configured, so forks without
@@ -203,9 +204,10 @@ run so a broken locator doesn't re-bill on every wait poll.
 
 ## Known rough edges
 
-- `example-tests` runs against **local fixtures** (a tiny HTTP server
-  serving `src/test/resources/fixtures`), not a live site — the suite
-  is deterministic and CI-safe. Point it at your own AUT for real use.
+- `example-tests` runs against the **self-contained example app**
+  (`examples/example-app`, an embedded HTTP server in the test JVM),
+  not a live site — the suite is deterministic and CI-safe. Point it at
+  your own AUT for real use.
 - `ChromeDriver`/`GeckoDriver` versions come from WebDriverManager at
   runtime, so a CI run's browser version can drift over time. Pin a
   specific version in `Setup` if you need reproducible browser

@@ -256,6 +256,12 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.cucumberbddparallel</groupId>
+            <artifactId>example-app</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-picocontainer</artifactId>
         </dependency>

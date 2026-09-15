@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>File upload - Example App</title>
+  <style>
+    body { font-family: sans-serif; max-width: 640px; margin: 2rem auto; }
+    #upload-result { margin-top: 1rem; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>File upload</h1>
+  <form id="upload-form">
+    <input id="file-input" type="file">
+    <button id="upload-button" type="submit">Upload</button>
+  </form>
+  <p id="upload-result"></p>
+  <script>
+    document.getElementById('upload-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var files = document.getElementById('file-input').files;
+      var name = files.length > 0 ? files[0].name : 'no file selected';
+      document.getElementById('upload-result').textContent = 'Uploaded: ' + name;
+    });
+  </script>
+</body>
+</html>
