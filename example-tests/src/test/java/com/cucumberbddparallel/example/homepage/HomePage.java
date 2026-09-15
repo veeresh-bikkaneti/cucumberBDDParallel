@@ -1,5 +1,6 @@
 package com.cucumberbddparallel.example.homepage;
 
+import com.cucumberbddparallel.example.support.FixtureHooks;
 import com.cucumberbddparallel.framework.page.BasePage;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -9,17 +10,18 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 /**
- * Page object for google.com's homepage - this is the example the whole `framework` module
- * is built to support. Note there's no Selenium setup code here at all: extending
+ * Page object for the example search homepage - this is the example the whole `framework`
+ * module is built to support. Note there's no Selenium setup code here at all: extending
  * {@code BasePage} gets you `driver`, `wait`, and working {@code @FindBy} fields for free.
  * All this class does is describe the page and what a test can do with it.
+ *
+ * The page under test is the local {@code fixtures/home.html} served by
+ * {@link FixtureHooks}' fixture server - deliberately not live google.com, so runs are
+ * hermetic (no geo redirects, consent banners, or markup drift between runs).
  */
 public class HomePage extends BasePage {
 
     private static final Logger LOG = LoggerFactory.getLogger(HomePage.class);
-    // "https://www.google." + a country code (e.g. "com", "fr") - see Home_page.feature for
-    // where the country comes from.
-    private static final String HOME_PAGE_URL = "https://www.google.";
 
     @FindBy(css = "#hplogo")
     private WebElement logo;
@@ -27,14 +29,19 @@ public class HomePage extends BasePage {
     @FindBy(css = "input[name=q]")
     private WebElement searchInput;
 
-    // Package-private on purpose - only this package's step definitions (HomePageSteps)
-    // should be creating page objects. Step definitions are the only thing that should be
-    // driving the browser; nothing outside this package needs a HomePage instance.
-    HomePage() {
+    /**
+     * Public because cucumber-picocontainer instantiates page objects via constructor
+     * injection (see {@link HomePageSteps}) - one instance per scenario, created lazily
+     * after the {@code @Before} hook has opened the browser.
+     */
+    public HomePage() {
     }
 
     void goToHomePage(String country) {
-        driver.get(HOME_PAGE_URL + country);
+        // `country` is legacy Gherkin wording ("A user navigates to HomePage "fr"") kept so the
+        // feature files still read naturally; the hermetic fixture serves the same page for
+        // every country code.
+        driver.get(FixtureHooks.baseUrl() + "/home.html");
         wait.forLoading(5);
     }
 
@@ -45,8 +52,9 @@ public class HomePage extends BasePage {
     void checkTitle(String title) {
         String displayedTitle = driver.getTitle();
         boolean matches = title.equals(displayedTitle);
-        LOG.info("Displayed title is \"{}\" instead of \"{}\": {}", displayedTitle, title, matches);
-        Assert.assertTrue(matches);
+        LOG.info("Page title check: expected \"{}\", displayed \"{}\", match={}", title, displayedTitle, matches);
+        Assert.assertTrue(matches,
+                "Expected page title \"" + title + "\" but the page showed \"" + displayedTitle + "\"");
     }
 
     void checkSearchBarDisplay() {

@@ -25,8 +25,8 @@ import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
  */
 public abstract class BasePage {
 
-    protected WebDriver driver;
-    protected Wait wait;
+    protected final WebDriver driver;
+    protected final Wait wait;
 
     public BasePage() {
         this.driver = DriverManager.get();

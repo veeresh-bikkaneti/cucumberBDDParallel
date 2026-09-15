@@ -15,9 +15,9 @@
     <description>CI-safe demos: tables, drag-drop, upload/download, PDF, QR, OCR</description>
 
     <properties>
-        <pdfbox.version>3.0.3</pdfbox.version>
-        <zxing.version>3.5.3</zxing.version>
-        <tess4j.version>5.13.0</tess4j.version>
+        <pdfbox.version>3.0.8</pdfbox.version>
+        <zxing.version>3.5.4</zxing.version>
+        <tess4j.version>5.19.0</tess4j.version>
     </properties>
 
     <dependencies>
@@ -69,7 +69,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>**/OcrValidationTest.java</exclude>
+                        <exclude>**/OcrValidationTest.class</exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -77,6 +77,11 @@
     </build>
 
     <profiles>
+        <!-- -Pocr-demo runs the FULL suite plus the OCR test. The base build excludes
+             OcrValidationTest (it needs the Tesseract binary); this profile lifts that
+             exclusion so everything runs, OCR included. (The test also self-skips via
+             @EnabledIf when tesseract is not on PATH, so this profile is safe to run
+             anywhere - without Tesseract you just get the regular suite.) -->
         <profile>
             <id>ocr-demo</id>
             <build>
@@ -86,9 +91,6 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <excludes combine.self="override"/>
-                            <includes>
-                                <include>**/OcrValidationTest.java</include>
-                            </includes>
                         </configuration>
                     </plugin>
                 </plugins>

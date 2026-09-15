@@ -30,8 +30,8 @@ public final class CostLogger {
         CostCalculator.cost(usage, model).ifPresentOrElse(
                 cost -> {
                     SESSION_TOTAL.updateAndGet(total -> total.add(cost));
-                    LOG.info("AI locator heal: element={} model={} in={} out={} cost=${}",
-                            elementName, model, usage.inputTokens(), usage.outputTokens(), cost);
+                    LOG.info("AI locator heal: element={} model={} in={} out={} cost={}",
+                            elementName, model, usage.inputTokens(), usage.outputTokens(), "$" + cost);
                 },
                 // Still worth logging even when we can't price it - you at least see that
                 // healing happened and how many tokens it used, just not the dollar figure.
@@ -55,8 +55,13 @@ public final class CostLogger {
             if (shutdownHookRegistered) {
                 return;
             }
-            Runtime.getRuntime().addShutdownHook(new Thread(() ->
-                    LOG.info("AI locator healing session total: ${}", SESSION_TOTAL.get())));
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                String summary = "AI locator healing session total: $" + SESSION_TOTAL.get();
+                LOG.info(summary);
+                // SLF4J may already be torn down by the time shutdown hooks run (or never
+                // have been bound at all) - print to stdout too so the total isn't lost.
+                System.out.println(summary);
+            }));
             shutdownHookRegistered = true;
         }
     }

@@ -1,6 +1,8 @@
 package com.cucumberbddparallel.framework.ai;
 
 import com.cucumberbddparallel.framework.ai.cost.TokenUsage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
@@ -8,6 +10,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,6 +30,8 @@ import java.util.regex.Pattern;
  */
 final class AnthropicHttpClient implements LlmMessagesClient {
 
+    private static final Logger LOG = LoggerFactory.getLogger(AnthropicHttpClient.class);
+
     private static final String ANTHROPIC_VERSION = "2023-06-01";
 
     // Matches the first {"type":"text","text":"..."} block in the response. Claude's replies
@@ -45,18 +50,32 @@ final class AnthropicHttpClient implements LlmMessagesClient {
             .connectTimeout(Duration.ofSeconds(10))
             .build();
 
+    private final AiHealingSettings settings;
+
+    AnthropicHttpClient() {
+        this(AiConfig.resolvedSettings());
+    }
+
+    // Package-private so tests can point the client at a local stub server.
+    AnthropicHttpClient(AiHealingSettings settings) {
+        this.settings = Objects.requireNonNull(settings, "settings");
+    }
+
     @Override
     public LlmResponse send(String system, String userMessage) {
-        String requestBody = "{"
-                + "\"model\":\"" + JsonEscaping.escape(AiConfig.model()) + "\","
-                + "\"max_tokens\":256,"
-                + "\"system\":\"" + JsonEscaping.escape(system) + "\","
-                + "\"messages\":[{\"role\":\"user\",\"content\":\"" + JsonEscaping.escape(userMessage) + "\"}]"
-                + "}";
+        // Values are escaped BEFORE formatting, so a % in the page HTML can never be
+        // mistaken for a format specifier - only the template's own %s placeholders count.
+        String requestBody = """
+                {"model":"%s","max_tokens":256,"system":"%s","messages":[\
+                {"role":"user","content":"%s"}]}"""
+                .formatted(JsonEscaping.escape(settings.model()),
+                        JsonEscaping.escape(system),
+                        JsonEscaping.escape(userMessage));
 
-        String apiUrl = AiConfig.baseUrl() + "/messages";
+        String apiUrl = settings.baseUrl() + "/messages";
         HttpRequest request = HttpRequest.newBuilder(URI.create(apiUrl))
-                .header("x-api-key", AiConfig.apiKey())
+                .timeout(LlmHttp.requestTimeout())
+                .header("x-api-key", settings.apiKey())
                 .header("anthropic-version", ANTHROPIC_VERSION)
                 .header("content-type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
@@ -64,13 +83,19 @@ final class AnthropicHttpClient implements LlmMessagesClient {
 
         String responseBody;
         try {
-            HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = LlmHttp.sendWithRetry(CLIENT, request);
             if (response.statusCode() != 200) {
+                LOG.warn("Claude API returned HTTP {} from {}", response.statusCode(), apiUrl);
                 throw new IllegalStateException(
                         "Claude API returned HTTP " + response.statusCode() + ": " + response.body());
             }
             responseBody = response.body();
-        } catch (IOException | InterruptedException e) {
+        } catch (InterruptedException e) {
+            // Restore the interrupt flag: swallowing it would leave the test thread
+            // thinking it was never interrupted, and the next blocking call would hang.
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Interrupted while calling Claude API for locator healing", e);
+        } catch (IOException e) {
             throw new IllegalStateException("Failed to call Claude API for locator healing", e);
         }
 
@@ -79,7 +104,10 @@ final class AnthropicHttpClient implements LlmMessagesClient {
         return new LlmResponse(text, parseUsage(responseBody));
     }
 
-    private static Optional<String> firstTextBlock(String responseJson) {
+    // Package-private (not private) so tests can call it directly with a handful of sample
+    // response bodies instead of needing a live API call to test parsing - same treatment
+    // as OpenAiCompatibleHttpClient.messageContent.
+    static Optional<String> firstTextBlock(String responseJson) {
         Matcher matcher = FIRST_TEXT_BLOCK.matcher(responseJson);
         return matcher.find() ? Optional.of(JsonEscaping.unescape(matcher.group(1))) : Optional.empty();
     }

@@ -18,11 +18,14 @@ CI-safe JUnit demos for common UI automation patterns — all served from a loca
 ./mvnw -pl examples/web-patterns-demo -am test
 ```
 
-OCR (requires Tesseract on PATH):
+OCR (requires Tesseract on PATH; without it the OCR test self-skips):
 
 ```bash
 ./mvnw -pl examples/web-patterns-demo -am test -Pocr-demo
 ```
+
+`-Pocr-demo` runs the **full suite plus** the OCR test — it lifts the base build's
+`OcrValidationTest` exclusion rather than running OCR in isolation.
 
 ## Docker
 

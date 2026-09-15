@@ -39,7 +39,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>**/LiveAiHealingDemoTest.java</exclude>
+                        <exclude>**/LiveAiHealingDemoTest.class</exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -57,7 +57,7 @@
                         <configuration>
                             <excludes combine.self="override"/>
                             <includes>
-                                <include>**/LiveAiHealingDemoTest.java</include>
+                                <include>**/LiveAiHealingDemoTest.class</include>
                             </includes>
                         </configuration>
                     </plugin>

@@ -1,14 +1,20 @@
 package com.cucumberbddparallel.framework.ai;
 
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
 /**
  * Immutable resolved configuration for one healing session. Built once from environment
  * variables; {@link AiConfig} delegates here instead of scattering provider switches.
+ *
+ * A record because this is pure data - four resolved values, no behavior worth a class
+ * hierarchy. The compact constructor guards the invariants (a settings object with a blank
+ * model or base URL is a bug, not a configuration), while {@link #resolve} stays the
+ * single static factory that builds one from the environment.
  */
-final class AiHealingSettings {
+record AiHealingSettings(AiProvider provider, String model, String apiKey, String baseUrl) {
 
     private static final String DEFAULT_ANTHROPIC_MODEL = "claude-sonnet-5";
     private static final String DEFAULT_OPENAI_MODEL = "gpt-4o-mini";
@@ -17,36 +23,19 @@ final class AiHealingSettings {
     private static final String DEFAULT_OLLAMA_BASE = "http://127.0.0.1:11434/v1";
     private static final String DEFAULT_ANTHROPIC_BASE = "https://api.anthropic.com/v1";
 
-    private final AiProvider provider;
-    private final String model;
-    private final String apiKey;
-    private final String baseUrl;
-
-    private AiHealingSettings(AiProvider provider, String model, String apiKey, String baseUrl) {
-        this.provider = provider;
-        this.model = model;
-        this.apiKey = apiKey;
-        this.baseUrl = baseUrl;
+    AiHealingSettings {
+        Objects.requireNonNull(provider, "provider");
+        if (model == null || model.isBlank()) {
+            throw new IllegalArgumentException("model must not be blank");
+        }
+        // apiKey is allowed to be null - Ollama needs no key, and bearerToken() handles
+        // the empty case for OpenAI-compatible endpoints.
+        if (baseUrl == null || baseUrl.isBlank()) {
+            throw new IllegalArgumentException("baseUrl must not be blank");
+        }
     }
 
-    AiProvider provider() {
-        return provider;
-    }
-
-    String model() {
-        return model;
-    }
-
-    /** Anthropic x-api-key, or BYOK key for OpenAI-compatible APIs. Empty for Ollama. */
-    String apiKey() {
-        return apiKey;
-    }
-
-    String baseUrl() {
-        return baseUrl;
-    }
-
-    /** Bearer token for OpenAI-compatible {@code Authorization} header; empty when not required. */
+    /** Bearer token for the OpenAI-compatible {@code Authorization} header; empty when not required. */
     Optional<String> bearerToken() {
         if (provider == AiProvider.OLLAMA || apiKey == null || apiKey.isBlank()) {
             return Optional.empty();
@@ -77,45 +66,45 @@ final class AiHealingSettings {
     }
 
     private static String resolveModel(AiProvider provider, Function<String, String> env) {
-        String unified = firstNonBlank(env.apply("AI_HEALING_MODEL"));
+        String unified = AiConfig.firstNonBlank(env.apply("AI_HEALING_MODEL"));
         if (unified != null) {
             return unified;
         }
         return switch (provider) {
-            case ANTHROPIC -> firstNonBlank(env.apply("ANTHROPIC_MODEL"), DEFAULT_ANTHROPIC_MODEL);
-            case OPENAI -> firstNonBlank(env.apply("OPENAI_MODEL"), DEFAULT_OPENAI_MODEL);
-            case OLLAMA -> firstNonBlank(env.apply("OLLAMA_MODEL"), DEFAULT_OLLAMA_MODEL);
+            case ANTHROPIC -> AiConfig.firstNonBlank(env.apply("ANTHROPIC_MODEL"), DEFAULT_ANTHROPIC_MODEL);
+            case OPENAI -> AiConfig.firstNonBlank(env.apply("OPENAI_MODEL"), DEFAULT_OPENAI_MODEL);
+            case OLLAMA -> AiConfig.firstNonBlank(env.apply("OLLAMA_MODEL"), DEFAULT_OLLAMA_MODEL);
         };
     }
 
     private static String resolveApiKey(AiProvider provider, Function<String, String> env) {
-        String unified = firstNonBlank(env.apply("AI_HEALING_API_KEY"));
+        String unified = AiConfig.firstNonBlank(env.apply("AI_HEALING_API_KEY"));
         if (unified != null) {
             return unified;
         }
         return switch (provider) {
-            case ANTHROPIC -> firstNonBlank(env.apply("ANTHROPIC_API_KEY"));
-            case OPENAI -> firstNonBlank(env.apply("OPENAI_API_KEY"));
+            case ANTHROPIC -> AiConfig.firstNonBlank(env.apply("ANTHROPIC_API_KEY"));
+            case OPENAI -> AiConfig.firstNonBlank(env.apply("OPENAI_API_KEY"));
             case OLLAMA -> null;
         };
     }
 
     private static String resolveBaseUrl(AiProvider provider, Function<String, String> env) {
-        String unified = normalizeBaseUrl(firstNonBlank(env.apply("AI_HEALING_BASE_URL")));
+        String unified = normalizeBaseUrl(AiConfig.firstNonBlank(env.apply("AI_HEALING_BASE_URL")));
         if (unified != null) {
             return unified;
         }
         return switch (provider) {
             case ANTHROPIC -> DEFAULT_ANTHROPIC_BASE;
             case OPENAI -> DEFAULT_OPENAI_BASE;
-            case OLLAMA -> normalizeOllamaBase(firstNonBlank(env.apply("OLLAMA_HOST"), DEFAULT_OLLAMA_BASE));
+            case OLLAMA -> normalizeOllamaBase(AiConfig.firstNonBlank(env.apply("OLLAMA_HOST"), DEFAULT_OLLAMA_BASE));
         };
     }
 
     private static boolean credentialsPresent(AiProvider provider, Function<String, String> env) {
         return switch (provider) {
             case OLLAMA -> true;
-            case ANTHROPIC, OPENAI -> firstNonBlank(
+            case ANTHROPIC, OPENAI -> AiConfig.firstNonBlank(
                     env.apply("AI_HEALING_API_KEY"),
                     provider == AiProvider.ANTHROPIC ? env.apply("ANTHROPIC_API_KEY") : env.apply("OPENAI_API_KEY")
             ) != null;
@@ -123,17 +112,17 @@ final class AiHealingSettings {
     }
 
     private static Optional<AiProvider> resolveProvider(Function<String, String> env) {
-        String explicit = firstNonBlank(env.apply("AI_HEALING_PROVIDER"));
+        String explicit = AiConfig.firstNonBlank(env.apply("AI_HEALING_PROVIDER"));
         if (explicit != null) {
             return Optional.of(parseProvider(explicit));
         }
-        if (firstNonBlank(env.apply("ANTHROPIC_API_KEY")) != null) {
+        if (AiConfig.firstNonBlank(env.apply("ANTHROPIC_API_KEY")) != null) {
             return Optional.of(AiProvider.ANTHROPIC);
         }
-        if (firstNonBlank(env.apply("OPENAI_API_KEY"), env.apply("AI_HEALING_API_KEY")) != null) {
+        if (AiConfig.firstNonBlank(env.apply("OPENAI_API_KEY"), env.apply("AI_HEALING_API_KEY")) != null) {
             return Optional.of(AiProvider.OPENAI);
         }
-        if (firstNonBlank(env.apply("OLLAMA_HOST")) != null
+        if (AiConfig.firstNonBlank(env.apply("OLLAMA_HOST")) != null
                 || "true".equalsIgnoreCase(env.apply("AI_HEALING_OLLAMA"))) {
             return Optional.of(AiProvider.OLLAMA);
         }
@@ -165,16 +154,7 @@ final class AiHealingSettings {
         if (url == null || url.isBlank()) {
             return null;
         }
-        return url.endsWith("/") ? url.substring(0, url.length() - 1) : url;
-    }
-
-    @SafeVarargs
-    private static String firstNonBlank(String... values) {
-        for (String value : values) {
-            if (value != null && !value.isBlank()) {
-                return value;
-            }
-        }
-        return null;
+        String trimmed = url.trim();
+        return trimmed.endsWith("/") ? trimmed.substring(0, trimmed.length() - 1) : trimmed;
     }
 }

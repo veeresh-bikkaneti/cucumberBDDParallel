@@ -11,18 +11,23 @@ import org.testng.Assert;
 import java.util.List;
 import java.util.stream.IntStream;
 
-/** Page object for the Google search results page - just the "is this URL in the first N results" check. */
+/** Page object for the example search results page - just the "is this URL in the first N results" check. */
 public class SearchResultPage extends BasePage {
 
     private static final Logger LOG = LoggerFactory.getLogger(SearchResultPage.class);
-    // Google renders each result's visible URL inside a <cite> tag - that's genuinely all
-    // we're matching against here, not the full result markup.
+    // The fixture (fixtures/search.html) renders each result's visible URL inside a <cite>
+    // tag - that's genuinely all we're matching against here, not the full result markup.
     private static final String RESULTS_URL_SELECTOR = "cite";
 
     @FindBy(css = RESULTS_URL_SELECTOR)
     private List<WebElement> results;
 
-    SearchResultPage() {
+    /**
+     * Public because cucumber-picocontainer instantiates page objects via constructor
+     * injection (see {@link SearchResultPageSteps}) - one instance per scenario, created
+     * lazily after the {@code @Before} hook has opened the browser.
+     */
+    public SearchResultPage() {
     }
 
     /** True if {@code expectedUrl} shows up among the first {@code nbOfResultsToSearch} results. */
@@ -36,7 +41,8 @@ public class SearchResultPage extends BasePage {
                 .findFirst()
                 .orElse(-1);
         boolean found = indexOfLink != -1;
-        LOG.info("Url \"{}\" wasn't found in the results: {}", expectedUrl, found);
-        Assert.assertTrue(found);
+        LOG.info("Url \"{}\" present in the first {} results: {}", expectedUrl, nbOfResultsToSearch, found);
+        Assert.assertTrue(found,
+                "Expected url \"" + expectedUrl + "\" in the first " + nbOfResultsToSearch + " results, but it was not there");
     }
 }

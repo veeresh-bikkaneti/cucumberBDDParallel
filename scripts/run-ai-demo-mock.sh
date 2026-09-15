@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(dirname "$0")/.."
-./mvnw -pl examples/ai-healing-demo -am test -Dtest=MockAiHealingDemoTest
+./mvnw -pl examples/ai-healing-demo -am test -Dtest=MockAiHealingDemoTest -Dsurefire.failIfNoSpecifiedTests=false

@@ -9,6 +9,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Explicit waits, one per situation you'd actually hit in a page object: waiting for the
@@ -21,43 +22,55 @@ import java.util.List;
  * Deliberately doesn't use {@code Thread.sleep} anywhere - fixed sleeps are either too
  * short (flaky) or too long (slow), and every method here polls instead until the real
  * condition is true or the timeout is hit.
+ *
+ * The wait methods return what they waited for (the element, the list, the JS result) so
+ * callers can use it directly instead of looking it up a second time.
  */
 public class Wait {
 
-    private WebDriver driver;
+    private final WebDriver driver;
 
     public Wait(WebDriver driver) {
-        this.driver = driver;
+        this.driver = Objects.requireNonNull(driver, "driver");
     }
 
     // The shared plumbing every wait*() method below uses - this is the one place that
     // knows how to build a WebDriverWait and attach a message to it. Adding a new kind of
     // wait means adding a new public method that calls this, not duplicating the
     // WebDriverWait setup again.
-    private <T> void waitUntilCondition(ExpectedCondition<T> condition, String timeoutMessage, int timeout) {
+    private <T> T waitUntilCondition(ExpectedCondition<T> condition, String timeoutMessage, int timeout) {
+        Objects.requireNonNull(condition, "condition");
+        Objects.requireNonNull(timeoutMessage, "timeoutMessage");
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
         wait.withMessage(timeoutMessage);
-        wait.until(condition);
+        return wait.until(condition);
     }
 
-    /** Waits for {@code document.readyState === "complete"} - use this right after navigating to a new page. */
-    public void forLoading(int timeout){
-        ExpectedCondition<Object> condition = ExpectedConditions.jsReturnsValue("return document.readyState==\"complete\";");
-        String timeoutMessage = "Page didn't load after " + Integer.toString(timeout) + " seconds.";
-        waitUntilCondition(condition, timeoutMessage, timeout);
+    /**
+     * Waits for {@code document.readyState === "complete"} - use this right after navigating
+     * to a new page. Returns the JS expression's result (usually {@code Boolean.TRUE}).
+     */
+    public Object forLoading(int timeout) {
+        ExpectedCondition<Object> condition = ExpectedConditions.jsReturnsValue("return document.readyState===\"complete\";");
+        String timeoutMessage = "Page didn't load after " + timeout + " seconds.";
+        return waitUntilCondition(condition, timeoutMessage, timeout);
     }
 
     /** Waits for a single element to be visible - the most common wait you'll reach for in a page object. */
-    public void forElementToBeDisplayed(int timeout, WebElement webElement, String webElementName){
+    public WebElement forElementToBeDisplayed(int timeout, WebElement webElement, String webElementName) {
+        Objects.requireNonNull(webElement, "webElement");
+        Objects.requireNonNull(webElementName, "webElementName");
         ExpectedCondition<WebElement> condition = ExpectedConditions.visibilityOf(webElement);
-        String timeoutMessage = webElementName + " wasn't displayed after " + Integer.toString(timeout) + " seconds.";
-        waitUntilCondition(condition, timeoutMessage, timeout);
+        String timeoutMessage = webElementName + " wasn't displayed after " + timeout + " seconds.";
+        return waitUntilCondition(condition, timeoutMessage, timeout);
     }
 
     /** Waits for at least one element matching {@code elementLocator} to exist in the DOM - handy for result lists that load asynchronously. */
-    public void forPresenceOfElements(int timeout, By elementLocator, String elementName){
+    public List<WebElement> forPresenceOfElements(int timeout, By elementLocator, String elementName) {
+        Objects.requireNonNull(elementLocator, "elementLocator");
+        Objects.requireNonNull(elementName, "elementName");
         ExpectedCondition<List<WebElement>> condition = ExpectedConditions.presenceOfAllElementsLocatedBy(elementLocator);
-        String timeoutMessage = elementName + " elements were not displayed after " + Integer.toString(timeout) + " seconds.";
-        waitUntilCondition(condition, timeoutMessage, timeout);
+        String timeoutMessage = elementName + " elements were not displayed after " + timeout + " seconds.";
+        return waitUntilCondition(condition, timeoutMessage, timeout);
     }
 }

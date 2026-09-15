@@ -66,6 +66,22 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
+                <configuration>
+                    <!-- The hand-written runners under **/runner/*Test.java are IDE conveniences
+                         for running one feature directly. They must NOT run under Surefire during
+                         the build: the real suite is the cucable-generated *IT runners executed by
+                         Failsafe. Excluding them here means plain `mvn verify` / `mvn test` never
+                         double-runs them, so there is no reason to pass -DskipTests (which Failsafe
+                         also honors - a build with -DskipTests would go green having run zero tests). -->
+                    <excludes>
+                        <exclude>**/runner/*Test.class</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${maven.failsafe.plugin.version}</version>
                 <executions>
@@ -153,7 +169,10 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <testFailureIgnore>${failsafe.testFailureIgnore.version}</testFailureIgnore>
+                            <!-- Fail the build on real test failures: the suite is hermetic now
+                                 (local fixture server, no live google.com), so failures are real
+                                 regressions, not network flake. -->
+                            <testFailureIgnore>false</testFailureIgnore>
                             <forkCount>2</forkCount>
                             <reuseForks>true</reuseForks>
                             <argLine>-Dfile.encoding=UTF-8</argLine>
@@ -166,10 +185,13 @@
                             </includes>
                         </configuration>
                     </plugin>
+                    <!-- cluecumber-report-plugin is dead (stuck at 2.9.4); its successor is
+                         cluecumber-maven. The reporting goal accepts the same configuration
+                         parameters, so the block below is carried over unchanged. -->
                     <plugin>
                         <groupId>com.trivago.rta</groupId>
-                        <artifactId>cluecumber-report-plugin</artifactId>
-                        <version>${cluecumber-report-plugin.version}</version>
+                        <artifactId>cluecumber-maven</artifactId>
+                        <version>${cluecumber-maven.version}</version>
                         <executions>
                             <execution>
                                 <id>execution</id>

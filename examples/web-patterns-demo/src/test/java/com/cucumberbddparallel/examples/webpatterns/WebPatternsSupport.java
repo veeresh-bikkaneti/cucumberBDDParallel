@@ -19,7 +19,11 @@ final class WebPatternsSupport {
     static WebDriver startHeadlessChrome(Path downloadDir) {
         WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless=new", "--window-size=1280,800", "--disable-gpu");
+        // --no-sandbox and --disable-dev-shm-usage are required when Chrome runs as root
+        // inside Docker (the default in CI): the sandbox refuses to start as root, and
+        // /dev/shm is typically too small for Chrome's renderer.
+        options.addArguments("--headless=new", "--window-size=1280,800", "--disable-gpu",
+                "--no-sandbox", "--disable-dev-shm-usage");
         if (downloadDir != null) {
             try {
                 Files.createDirectories(downloadDir);

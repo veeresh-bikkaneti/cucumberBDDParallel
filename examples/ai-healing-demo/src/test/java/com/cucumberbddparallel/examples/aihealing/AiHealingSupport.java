@@ -20,7 +20,11 @@ final class AiHealingSupport {
     static WebDriver startHeadlessChrome() {
         WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless=new", "--window-size=1280,800", "--disable-gpu");
+        // --no-sandbox and --disable-dev-shm-usage are required when Chrome runs as root
+        // inside Docker (the default in CI): the sandbox refuses to start as root, and
+        // /dev/shm is typically too small for Chrome's renderer.
+        options.addArguments("--headless=new", "--window-size=1280,800", "--disable-gpu",
+                "--no-sandbox", "--disable-dev-shm-usage");
         WebDriver driver = new ChromeDriver(options);
         DriverManager.set(driver);
         return driver;
@@ -31,6 +35,10 @@ final class AiHealingSupport {
         setProperty("AI_HEALING_API_KEY", "demo-mock-key");
         setProperty("AI_HEALING_MODEL", "demo-mock-model");
         setProperty("AI_HEALING_BASE_URL", baseUrl);
+    }
+
+    static void disableHealing() {
+        setProperty("ai.healing.enabled", "false");
     }
 
     static void clearAiHealingProperties() {

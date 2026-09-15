@@ -19,10 +19,10 @@ would.
 | Principle | Where | Why |
 |---|---|---|
 | Single Responsibility | `DriverManager` owns driver lifecycle; `Setup` only creates a driver; `TearDown` only tears one down | each class has exactly one reason to change |
-| Single Responsibility | `AiLocatorHealer` orchestrates; `ClaudeMessagesClient` does HTTP; `SelectorResponseParser` parses; `JsonEscaping` encodes | each piece is testable and changeable independently, none of them need a live network call to verify |
+| Single Responsibility | `AiLocatorHealer` orchestrates; `AnthropicHttpClient` does HTTP; `SelectorResponseParser` parses; `JsonEscaping` encodes | each piece is testable and changeable independently, none of them need a live network call to verify |
 | Open/Closed | `ModelPricing` is a lookup table, not an if/else chain | adding a model is a one-line map entry, no existing code path changes |
 | Liskov Substitution | `AiElementLocatorFactory` and Selenium's `DefaultElementLocatorFactory` both implement `ElementLocatorFactory` | `BasePage` works with either without knowing which one it got |
-| Interface Segregation | `ClaudeMessagesClient` exposes exactly the one method callers need | nothing depends on HTTP internals it doesn't use |
+| Interface Segregation | `AnthropicHttpClient` exposes exactly the one method callers need | nothing depends on HTTP internals it doesn't use |
 | Dependency Inversion | `BasePage` depends on the `ElementLocatorFactory` interface, not a concrete class | the locator strategy can change without touching `BasePage` |
 
 ## Depending on `framework` from another repo
@@ -128,11 +128,13 @@ other jobs), pass `-Dai.healing.enabled=false`.
 
 ## CI
 
-Three jobs in `.github/workflows/ci.yml`:
+Five jobs in `.github/workflows/ci.yml`:
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[push or pull_request] --> B[unit-tests]
+    B --> H[ai-healing-demo]
+    B --> W[web-patterns-demo]
     B --> C[e2e-no-ai]
     B --> D[e2e-with-ai]
     D --> E{AI healing credentials secret set?}
@@ -141,9 +143,13 @@ flowchart LR
 ```
 
 - **unit-tests** - `framework`'s JUnit 5 suite. No browser, no
-  network, fast. Gates the other two jobs.
-- **e2e-no-ai** - the example suite against google.com with no API
-  key present. Proves the framework works standalone.
+  network, fast. Gates the other four jobs.
+- **ai-healing-demo** - `MockAiHealingDemoTest`: deterministic
+  broken-locator → mock LLM → healed test. No API key needed.
+- **web-patterns-demo** - tables, drag-drop, upload/download, PDF, QR
+  against local fixtures in headless Chrome.
+- **e2e-no-ai** - the example BDD suite against local fixtures with
+  no AI healing. Proves the framework works standalone.
 - **e2e-with-ai** - same suite, with AI healing credentials from a repo
   secret (`ANTHROPIC_API_KEY` or unified `AI_HEALING_*` vars). Skips
   itself gracefully when the secret isn't configured, so forks without
@@ -178,7 +184,9 @@ sequenceDiagram
 If the retried lookup also fails, the original
 `NoSuchElementException` is rethrown with the healing failure attached
 as a suppressed exception - you still get the original stack trace,
-plus what the AI tried.
+plus what the AI tried. Transient HTTP failures (429/5xx) are retried
+with backoff before giving up, and healed selectors are cached for the
+run so a broken locator doesn't re-bill on every wait poll.
 
 ## Extending the framework
 
@@ -195,10 +203,9 @@ plus what the AI tried.
 
 ## Known rough edges
 
-- `example-tests` runs against live google.com. It's a demo, not a
-  correctness gate on the framework - Google changing their markup
-  will break it independently of anything in this repo. Point it at
-  your own AUT for real use.
+- `example-tests` runs against **local fixtures** (a tiny HTTP server
+  serving `src/test/resources/fixtures`), not a live site — the suite
+  is deterministic and CI-safe. Point it at your own AUT for real use.
 - `ChromeDriver`/`GeckoDriver` versions come from WebDriverManager at
   runtime, so a CI run's browser version can drift over time. Pin a
   specific version in `Setup` if you need reproducible browser

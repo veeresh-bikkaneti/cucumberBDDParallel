@@ -51,7 +51,7 @@ class OcrValidationTest {
                 tesseract.setDatapath(dataPath);
             }
             String text = tesseract.doOCR(tempImage.toFile());
-            assertTrue(text.toUpperCase().contains("INVOICE"),
+            assertTrue(text.toUpperCase().contains(WebPatternsFixtureServer.OCR_EXPECTED_TEXT),
                     "OCR text was: " + text);
         } finally {
             Files.deleteIfExists(tempImage);

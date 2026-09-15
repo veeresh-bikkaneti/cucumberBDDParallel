@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <!-- Local stand-in for a search results page (see FixtureServer). Results are static
+       and deterministic: the first <cite> always matches what Search.feature asserts. -->
+  <title>Search results</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; }
+    .result { margin-bottom: 1.5rem; }
+    cite { font-style: normal; color: #1a0dab; }
+  </style>
+</head>
+<body>
+  <main id="results">
+    <div class="result">
+      <a href="https://hiptest.com/"><cite>https://hiptest.com/</cite></a>
+      <h3>Hiptest - example result one</h3>
+    </div>
+    <div class="result">
+      <a href="https://example.com/"><cite>https://example.com/</cite></a>
+      <h3>Example Domain - example result two</h3>
+    </div>
+    <div class="result">
+      <a href="https://example.org/"><cite>https://example.org/</cite></a>
+      <h3>Example Organization - example result three</h3>
+    </div>
+  </main>
+</body>
+</html>

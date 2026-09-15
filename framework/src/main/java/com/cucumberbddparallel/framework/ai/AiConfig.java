@@ -85,12 +85,20 @@ public final class AiConfig {
                         "AI healing is not enabled — set provider credentials or AI_HEALING_PROVIDER"));
     }
 
-    private static String firstNonBlank(String a, String b) {
-        if (a != null && !a.isBlank()) {
-            return a;
-        }
-        if (b != null && !b.isBlank()) {
-            return b;
+    /** The resolved settings for the real environment; throws if healing isn't configured. */
+    static AiHealingSettings resolvedSettings() {
+        return requireSettings();
+    }
+
+    /**
+     * First non-blank value wins. Shared with {@link AiHealingSettings} so the "env var
+     * first, then fallback" rule lives in exactly one place.
+     */
+    static String firstNonBlank(String... values) {
+        for (String value : values) {
+            if (value != null && !value.isBlank()) {
+                return value;
+            }
         }
         return null;
     }

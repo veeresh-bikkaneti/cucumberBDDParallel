@@ -40,10 +40,12 @@ A copy-ready template lives at [`docs/mcp-selenium-config.example.json`](mcp-sel
 1. **Start fixtures locally** (no google.com flake):
 
    ```bash
-   ./mvnw -pl examples/web-patterns-demo -am test -Dtest=TablePatternsTest
+   ./mvnw -pl examples/web-patterns-demo -am test -Dtest=TablePatternsTest -Dsurefire.failIfNoSpecifiedTests=false -Dheadless=true
    ```
 
-   Tests spin up `WebPatternsFixtureServer` on a random port — for manual MCP exploration, run any demo test in the IDE and note the logged base URL, or start the module tests and inspect failure screenshots.
+   Tests spin up `WebPatternsFixtureServer` on a random port. For manual MCP exploration,
+   either run any demo test in the IDE and note the logged base URL, or start the module
+   tests and inspect the failure screenshots.
 
 2. **Open a browser session** via MCP (`start_browser` / equivalent tool from mcp-selenium).
 
@@ -86,7 +88,7 @@ OCR (needs Tesseract inside the image):
 docker compose --profile ocr run --rm cucumber-examples-ocr
 ```
 
-Full Google `example-tests` integration (network + live site):
+Full `example-tests` integration (local fixtures, headless Chrome):
 
 ```bash
 docker compose --profile integration run --rm cucumber-integration

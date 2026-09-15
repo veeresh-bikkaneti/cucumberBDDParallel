@@ -14,9 +14,11 @@ import java.util.regex.Pattern;
  */
 final class SelectorResponseParser {
 
-    // (?:css)? makes the "css" language tag after ``` optional, since we ask for a selector
-    // but can't fully control whether the model labels the fence.
-    private static final Pattern CODE_FENCE = Pattern.compile("```(?:css)?\\s*(.+?)\\s*```", Pattern.DOTALL);
+    private static final Pattern CODE_FENCE = Pattern.compile("```\\s*(.+?)\\s*```", Pattern.DOTALL);
+    // Models label the fence however they like - ```css, ```CSS, ```javascript, or nothing
+    // at all. The label (if any) is always on the fence's own line, so it's safe to strip a
+    // leading word followed by a line break; a selector on the fence's line is left alone.
+    private static final Pattern LANGUAGE_TAG = Pattern.compile("(?i)^[a-z][\\w+.-]*\\R");
 
     private SelectorResponseParser() {
     }
@@ -24,6 +26,9 @@ final class SelectorResponseParser {
     /** Extracts the selector from a code fence if there is one, otherwise just trims the reply. */
     static String selectorFrom(String claudeReplyText) {
         Matcher fenced = CODE_FENCE.matcher(claudeReplyText);
-        return (fenced.find() ? fenced.group(1) : claudeReplyText).trim();
+        String extracted = fenced.find() ? fenced.group(1) : claudeReplyText;
+        Matcher tag = LANGUAGE_TAG.matcher(extracted);
+        String withoutTag = tag.find() ? extracted.substring(tag.end()) : extracted;
+        return withoutTag.trim();
     }
 }

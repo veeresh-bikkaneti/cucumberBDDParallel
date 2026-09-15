@@ -108,14 +108,11 @@ class AiConfigTest {
 
     @Test
     void systemPropertyEnablesOpenAiProviderForDemos() {
-        try {
-            System.setProperty("AI_HEALING_PROVIDER", "openai");
-            System.setProperty("AI_HEALING_API_KEY", "demo-key");
-            assertTrue(AiConfig.isHealingEnabled());
-            assertEquals(AiProvider.OPENAI, AiConfig.provider());
-        } finally {
-            System.clearProperty("AI_HEALING_PROVIDER");
-            System.clearProperty("AI_HEALING_API_KEY");
-        }
+        // Same scenario as before (provider + key supplied as system properties), but with
+        // fake lookup maps instead of mutating the real System properties - global state
+        // mutations leak across tests when run in parallel and make failures order-dependent.
+        Map<String, String> props = Map.of("AI_HEALING_PROVIDER", "openai", "AI_HEALING_API_KEY", "demo-key");
+        assertTrue(AiConfig.isHealingEnabled(props::get, props::get));
+        assertEquals(AiProvider.OPENAI, AiConfig.provider(props::get));
     }
 }

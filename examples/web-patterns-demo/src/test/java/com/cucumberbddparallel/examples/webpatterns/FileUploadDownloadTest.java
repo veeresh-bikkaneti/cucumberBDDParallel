@@ -13,6 +13,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -47,7 +48,7 @@ class FileUploadDownloadTest {
     }
 
     @Test
-    void uploadsFileThroughHiddenInput() {
+    void uploadsFileThroughFileInput() {
         driver.get(server.url("/upload.html"));
         WebElement input = driver.findElement(By.cssSelector("#file-input"));
         FileUploadHelper.upload(input, uploadFile);
@@ -69,11 +70,21 @@ class FileUploadDownloadTest {
     private static Path waitForFile(Path expected, Duration timeout) throws InterruptedException {
         long deadline = System.currentTimeMillis() + timeout.toMillis();
         while (System.currentTimeMillis() < deadline) {
-            if (Files.isRegularFile(expected)) {
+            // Only accept the file once Chrome has finished writing it: while a download is
+            // in flight Chrome keeps a transient "<name>.crdownload" file next to the target.
+            if (Files.isRegularFile(expected) && !hasPartialDownload(expected.getParent())) {
                 return expected;
             }
             Thread.sleep(250);
         }
         throw new AssertionError("File did not appear: " + expected);
+    }
+
+    private static boolean hasPartialDownload(Path dir) {
+        try (var files = Files.list(dir)) {
+            return files.anyMatch(p -> p.getFileName().toString().endsWith(".crdownload"));
+        } catch (IOException e) {
+            return false;
+        }
     }
 }

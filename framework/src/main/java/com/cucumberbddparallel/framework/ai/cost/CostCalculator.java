@@ -15,7 +15,7 @@ import java.util.Optional;
  */
 public final class CostCalculator {
 
-    private static final BigDecimal ONE_MILLION = new BigDecimal("1000000");
+    private static final BigDecimal ONE_MILLION = BigDecimal.valueOf(1_000_000);
 
     private CostCalculator() {
     }

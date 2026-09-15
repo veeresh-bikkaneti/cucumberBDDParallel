@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <!-- Local stand-in for a search homepage (see FixtureServer): keeps example-tests
+       hermetic - no live google.com, no geo/consent variance between runs. The ids and
+       input name below are what HomePage's @FindBy locators bind to. -->
+  <title>Google</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; text-align: center; }
+    #hplogo { margin: 3rem auto 2rem; display: block; }
+    input[name="q"] { width: 32rem; max-width: 90%; padding: 0.75rem 1rem; font-size: 1rem; }
+  </style>
+</head>
+<body>
+  <img id="hplogo" alt="Example search logo"
+       src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" />
+  <form action="search.html" method="get">
+    <input type="text" name="q" aria-label="Search" autocomplete="off" />
+  </form>
+</body>
+</html>

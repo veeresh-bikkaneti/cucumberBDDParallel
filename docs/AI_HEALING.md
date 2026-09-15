@@ -1,100 +1,142 @@
-# AI locator healing — provider configuration
+# AI self-healing locators
 
-Locator healing is optional. When enabled, a broken `@FindBy` triggers one
-LLM call to suggest a new CSS selector, then a single retry.
+When a `@FindBy` locator can't find its element — usually because the
+page markup changed — the framework can ask a large language model for
+a replacement CSS selector and retry once before failing the step.
+This is **opt-in and off by default**: with no provider configured,
+nothing ever leaves your machine.
 
-## Environment variables
+## How it works
 
-| Variable | Purpose |
-|----------|---------|
-| `AI_HEALING_PROVIDER` | `anthropic`, `openai`, or `ollama` (recommended — explicit choice) |
-| `AI_HEALING_MODEL` | Model name for the selected provider |
-| `AI_HEALING_API_KEY` | BYOK API key (works with any provider that needs auth) |
-| `AI_HEALING_BASE_URL` | OpenAI-compatible base URL (`.../v1`) for gateways or custom hosts |
-| `ai.healing.enabled` | JVM property; set `false` to disable even when credentials exist |
+1. A page-object field's `@FindBy` lookup throws `NoSuchElementException`.
+2. `AiLocatorHealer` sends the page HTML plus a description of the
+   intended element to the configured LLM.
+3. The LLM replies with a CSS selector; the framework retries the
+   lookup with it.
+4. The healed selector is cached for the rest of the run, so the same
+   broken locator doesn't trigger a new LLM call on every poll.
+5. If healing fails (network error, bad selector, timeout), the
+   **original** `NoSuchElementException` is rethrown with the healing
+   failure attached as a suppressed exception.
 
-### Legacy / provider-specific (still supported)
+See [Architecture](ARCHITECTURE.md#ai-self-healing-end-to-end) for the
+sequence diagram.
 
-| Variable | Provider |
-|----------|----------|
-| `ANTHROPIC_API_KEY` | Anthropic (auto-selects `anthropic` when set) |
-| `ANTHROPIC_MODEL` | Anthropic model override |
-| `OPENAI_API_KEY` | OpenAI-compatible (auto-selects `openai` when set) |
-| `OPENAI_MODEL` | OpenAI model override |
-| `OLLAMA_HOST` | Ollama host, e.g. `http://127.0.0.1:11434` (appends `/v1`) |
-| `OLLAMA_MODEL` | Ollama model override |
-| `AI_HEALING_OLLAMA` | Set `true` to enable Ollama without other keys |
+## Providers
 
-## Defaults when unset
+You pick the route — nothing is locked to one vendor. The clients are
+hand-rolled on the JDK `HttpClient` (no SDK dependencies); Ollama
+works because it speaks the OpenAI-compatible chat API.
 
-| Provider | Default model | Default base URL |
-|----------|---------------|------------------|
-| `anthropic` | `claude-sonnet-5` | `https://api.anthropic.com/v1` |
-| `openai` | `gpt-4o-mini` | `https://api.openai.com/v1` |
-| `ollama` | `llama3.2` | `http://127.0.0.1:11434/v1` |
+| Provider | `AI_HEALING_PROVIDER` | Needs | Default model |
+|---|---|---|---|
+| Anthropic (BYOK) | `anthropic` | `AI_HEALING_API_KEY` | `claude-sonnet-5` |
+| OpenAI or compatible gateway (BYOK) | `openai` | `AI_HEALING_API_KEY` | `gpt-4o-mini` |
+| Local Ollama | `ollama` | Ollama running, model pulled | `llama3.2` |
 
-## Examples
-
-### Anthropic BYOK
+### Anthropic
 
 ```bash
 export AI_HEALING_PROVIDER=anthropic
-export AI_HEALING_API_KEY="$ANTHROPIC_API_KEY"
-export AI_HEALING_MODEL=claude-sonnet-5
+export AI_HEALING_API_KEY=sk-ant-...
+export AI_HEALING_MODEL=claude-sonnet-5   # optional
 ```
 
-### OpenAI BYOK
+Legacy `ANTHROPIC_API_KEY` / `ANTHROPIC_MODEL` variables are still
+honored.
+
+### OpenAI-compatible
 
 ```bash
 export AI_HEALING_PROVIDER=openai
-export AI_HEALING_API_KEY="$OPENAI_API_KEY"
+export AI_HEALING_API_KEY=sk-...
+export AI_HEALING_MODEL=gpt-4o-mini        # optional
+# export AI_HEALING_BASE_URL=https://my-gateway.example/v1   # optional
 ```
 
-### Local Ollama
+### Ollama
 
 ```bash
 ollama pull llama3.2
 export AI_HEALING_PROVIDER=ollama
 export AI_HEALING_MODEL=llama3.2
+# export OLLAMA_HOST=http://127.0.0.1:11434   # if not on localhost:11434
 ```
 
-### Custom OpenAI-compatible gateway
+Or via Docker Compose: `docker compose -f docker-compose.ollama.yml up -d`.
 
-```bash
-export AI_HEALING_PROVIDER=openai
-export AI_HEALING_API_KEY=your-gateway-key
-export AI_HEALING_BASE_URL=https://llm.internal.company/v1
-export AI_HEALING_MODEL=your-model-id
+## Configuration reference
+
+| Variable | System property | Default | Purpose |
+|---|---|---|---|
+| `AI_HEALING_PROVIDER` | `ai.healing.provider` | — (healing off) | `anthropic`, `openai`, or `ollama` |
+| `AI_HEALING_API_KEY` | `ai.healing.apiKey` | — | API key (BYOK). Not needed for Ollama |
+| `AI_HEALING_MODEL` | `ai.healing.model` | per-provider default | Model to ask for selectors |
+| `AI_HEALING_BASE_URL` | `ai.healing.baseUrl` | provider default | Override the API endpoint (gateways, proxies) |
+| `AI_HEALING_TIMEOUT_SECONDS` | `ai.healing.timeoutSeconds` | `30` | HTTP request timeout per healing call |
+| `AI_HEALING_DEMO_LIVE` | — | `false` | Demo-only: run `LiveAiHealingDemoTest` against a real provider |
+| — | `ai.healing.enabled` | `true` when configured | Set `-Dai.healing.enabled=false` to force healing off |
+| `ANTHROPIC_API_KEY` / `ANTHROPIC_MODEL` | — | — | Legacy Anthropic variables (still work) |
+| `OPENAI_API_KEY` | — | — | Fallback key for the `openai` provider |
+| `OLLAMA_HOST` | — | `http://127.0.0.1:11434` | Where Ollama listens |
+
+Never commit API keys to source control. The demo module ships
+`.env.example.*` files as templates.
+
+## Reliability behavior
+
+- **Timeouts:** every healing HTTP call has a 30s request timeout
+  (configurable via `AI_HEALING_TIMEOUT_SECONDS`); connect timeout is 10s.
+- **Retries:** HTTP 429/5xx responses are retried up to 3 times with
+  exponential backoff + jitter. Other failures fail fast.
+- **Interrupt handling:** thread interrupts are propagated, not swallowed.
+- **Cache:** a healed selector is reused for the rest of the JVM run.
+  If it breaks again later, the framework re-heals and updates the cache.
+
+## Cost tracking
+
+Every healing call logs one SLF4J line:
+
+```
+AI locator heal: element=searchInput model=claude-sonnet-5 in=1842 out=12 cost=$0.005706
 ```
 
-## Auto-detection (when `AI_HEALING_PROVIDER` is unset)
+A shutdown hook logs the JVM session total on exit:
 
-1. `ANTHROPIC_API_KEY` present → Anthropic
-2. Else `OPENAI_API_KEY` or `AI_HEALING_API_KEY` → OpenAI-compatible
-3. Else `OLLAMA_HOST` or `AI_HEALING_OLLAMA=true` → Ollama
-4. Else healing stays **off**
+```
+AI locator healing session total: $0.005706
+```
 
-If multiple credential sets are present (e.g. both `ANTHROPIC_API_KEY` and
-`OPENAI_API_KEY`), Anthropic wins unless you set `AI_HEALING_PROVIDER` explicitly.
+Pricing comes from `ModelPricing` (a snapshot, not live data — check
+the provider's pricing page for budget planning; versioned model IDs
+like `claude-sonnet-5-20250929` match their base entries). In CI, the
+`e2e-with-ai` job extracts these lines into the GitHub step summary.
 
-Prefer setting `AI_HEALING_PROVIDER` explicitly so CI and teammates know
-which backend you intended.
+Rough math: at Sonnet rates, a typical heal (~2k input tokens of page
+HTML, a few dozen output tokens) costs well under a cent. The real
+cost driver is how often your markup changes, not the per-call price.
 
-## Run the demo
+## Troubleshooting
 
-Deterministic mock (CI-safe, no cloud key):
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| Healing never triggers | No provider configured | Set `AI_HEALING_PROVIDER` + key (or Ollama) |
+| `NoSuchElementException` with suppressed healing error | LLM unreachable / bad selector | Check the suppressed exception; verify key, base URL, network |
+| Slow scenarios | LLM latency on many broken locators | Fix the locators — healing is a safety net, not a strategy |
+| Healing fires on every wait poll | Cached selector went stale (page changed again) | Expected: the stale entry is dropped and re-healed once |
+| `cost=$unknown` in logs | Model not in `ModelPricing` | Add a one-line entry to the pricing table |
+
+## Demo
+
+`examples/ai-healing-demo` proves the whole flow deterministically:
 
 ```bash
+# Mock LLM, no key needed — this is what CI runs
 ./mvnw -pl examples/ai-healing-demo -am test
+
+# Live provider (needs credentials)
+./scripts/run-ai-demo-anthropic.sh   # or -openai / -ollama
+# Windows: .\scripts\run-ai-demo-anthropic.ps1 (etc.)
 ```
 
-Live provider (Anthropic, OpenAI, or Ollama):
-
-```bash
-export AI_HEALING_DEMO_LIVE=true
-# plus provider vars — see examples/ai-healing-demo/README.md
-./mvnw -pl examples/ai-healing-demo -am test -Plive-ai-demo
-```
-
-Scripts: `scripts/run-ai-demo-mock.sh`, `run-ai-demo-anthropic.sh`,
-`run-ai-demo-openai.sh`, `run-ai-demo-ollama.sh`.
+See `examples/ai-healing-demo/README.md` for the full matrix.

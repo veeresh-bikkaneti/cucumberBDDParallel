@@ -35,6 +35,9 @@ public final class MockLlmServer {
         server.createContext("/v1/chat/completions", exchange -> {
             if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
                 called.set(true);
+                // Drain the request body before responding - without this, the unread bytes
+                // can wedge the HTTP exchange (and poison keep-alive connections).
+                exchange.getRequestBody().readAllBytes();
                 exchange.getResponseHeaders().add("Content-Type", "application/json");
                 exchange.sendResponseHeaders(200, body.length);
                 exchange.getResponseBody().write(body);

@@ -37,20 +37,20 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>21</java.version>
         <testng.version>7.12.0</testng.version>
-        <cucumber.version>7.34.4</cucumber.version>
-        <selenium.version>4.45.0</selenium.version>
+        <cucumber.version>7.34.8</cucumber.version>
+        <selenium.version>4.49.0</selenium.version>
         <webdrivermanager.version>6.3.4</webdrivermanager.version>
-        <slf4j.version>2.0.17</slf4j.version>
-        <junit.jupiter.version>5.11.4</junit.jupiter.version>
-        <mockito.version>5.15.2</mockito.version>
-        <cucable-plugin.version>1.16.0</cucable-plugin.version>
-        <maven.compiler.plugin.version>3.15.0</maven.compiler.plugin.version>
-        <maven.surefire.plugin.version>3.5.2</maven.surefire.plugin.version>
+        <slf4j.version>2.0.18</slf4j.version>
+        <junit.jupiter.version>5.14.3</junit.jupiter.version>
+        <mockito.version>5.23.0</mockito.version>
+        <cucable-plugin.version>1.16.1</cucable-plugin.version>
+        <maven.compiler.plugin.version>3.16.0</maven.compiler.plugin.version>
+        <maven.surefire.plugin.version>3.5.6</maven.surefire.plugin.version>
         <maven.failsafe.plugin.version>3.5.6</maven.failsafe.plugin.version>
         <maven.build.helper.plugin.version>3.6.1</maven.build.helper.plugin.version>
         <maven.cucumber.reporting.version>5.11.0</maven.cucumber.reporting.version>
-        <cluecumber-report-plugin.version>2.9.4</cluecumber-report-plugin.version>
-        <failsafe.testFailureIgnore.version>true</failsafe.testFailureIgnore.version>
+        <cluecumber-maven.version>4.4.0</cluecumber-maven.version>
+        <failsafe.testFailureIgnore>true</failsafe.testFailureIgnore>
     </properties>
 
     <dependencyManagement>
@@ -122,8 +122,7 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven.compiler.plugin.version}</version>
                     <configuration>
-                        <source>${java.version}</source>
-                        <target>${java.version}</target>
+                        <release>${java.version}</release>
                     </configuration>
                 </plugin>
                 <plugin>

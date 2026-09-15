@@ -29,10 +29,33 @@ public final class ModelPricing {
 
     /** Empty if we don't have a price for this model - see {@link CostCalculator} for how that's handled. */
     public static Optional<BigDecimal> inputRatePerMillion(String model) {
-        return Optional.ofNullable(RATES.get(model)).map(Rate::inputPerMillion);
+        return findRate(model).map(Rate::inputPerMillion);
     }
 
     public static Optional<BigDecimal> outputRatePerMillion(String model) {
-        return Optional.ofNullable(RATES.get(model)).map(Rate::outputPerMillion);
+        return findRate(model).map(Rate::outputPerMillion);
+    }
+
+    /**
+     * Exact match first; otherwise the longest base-model prefix wins. Providers love
+     * versioned model IDs (e.g. {@code claude-sonnet-5-20250929}), and the price for the
+     * dated variant is the price of the base model - without prefix matching every new
+     * release would silently report "unknown cost" until someone updated this table.
+     */
+    private static Optional<Rate> findRate(String model) {
+        if (model == null) {
+            return Optional.empty();
+        }
+        Rate exact = RATES.get(model);
+        if (exact != null) {
+            return Optional.of(exact);
+        }
+        String bestPrefix = null;
+        for (String base : RATES.keySet()) {
+            if (model.startsWith(base) && (bestPrefix == null || base.length() > bestPrefix.length())) {
+                bestPrefix = base;
+            }
+        }
+        return Optional.ofNullable(bestPrefix).map(RATES::get);
     }
 }

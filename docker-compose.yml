@@ -11,6 +11,7 @@ services:
       -pl examples/web-patterns-demo,examples/ai-healing-demo
       -am test
       -Dsurefire.failIfNoSpecifiedTests=false
+      -Dheadless=true
 
   cucumber-examples-ocr:
     profiles: ["ocr"]
@@ -23,6 +24,7 @@ services:
     command: >
       ./mvnw -B -pl examples/web-patterns-demo -am test -Pocr-demo
       -Dtest=OcrValidationTest -Dsurefire.failIfNoSpecifiedTests=false
+      -Dheadless=true
 
   cucumber-integration:
     profiles: ["integration"]
@@ -30,4 +32,4 @@ services:
     image: cucumberbddparallel-examples:latest
     shm_size: "2gb"
     command: >
-      ./mvnw -B clean verify -Pintegration-test -DskipTests -pl example-tests -am
+      ./mvnw -B clean verify -Pintegration-test -Dheadless=true -pl example-tests -am

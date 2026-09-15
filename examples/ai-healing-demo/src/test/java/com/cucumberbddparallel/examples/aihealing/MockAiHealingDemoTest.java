@@ -54,7 +54,7 @@ class MockAiHealingDemoTest {
 
     @Test
     void sameLocatorFailsWhenHealingDisabled() {
-        System.setProperty("ai.healing.enabled", "false");
+        AiHealingSupport.disableHealing();
         DemoPage page = new DemoPage();
         assertThrows(NoSuchElementException.class, page::assertLogoVisible);
         assertFalse(mockLlm.wasCalled(), "Mock LLM must not run when healing is off");

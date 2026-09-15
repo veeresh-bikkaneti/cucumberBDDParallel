@@ -1,33 +1,58 @@
 # cucumberBDDParallel
 
-A Cucumber + Selenium 4 + TestNG framework for browser BDD tests, split
-into two pieces. I built this the way I wish more test frameworks were
-built: a small reusable core you can actually depend on, a real
-working example instead of a toy one, and locators that don't need a
-babysitter every time a page's markup shifts.
+A Cucumber + Selenium 4 + TestNG framework for parallel browser BDD
+tests, with an opt-in AI self-healing locator. I built this the way I
+wish more test frameworks were built: a small reusable core you can
+actually depend on, real working examples instead of toy ones, and
+locators that don't need a babysitter every time a page's markup
+shifts.
 
-The two pieces:
+## What's inside
 
-- `framework/` - the reusable part: driver setup/teardown, explicit
-  waits, a base page class, and an opt-in AI self-healing locator.
-  Depend on this from your own test project the same way
-  `example-tests` does.
-- `example-tests/` - a working example against google.com, showing
-  page objects, step definitions, feature files, and TestNG runners
-  built on top of `framework`.
+| Module | What it is |
+|---|---|
+| `framework/` | The reusable core: driver setup/teardown, explicit waits, a base page class, web-pattern helpers, and the opt-in AI self-healing locator. Depend on this from your own test project. |
+| `example-tests/` | A working BDD suite against **local fixtures** (no live-site flake): Gherkin features, step definitions, page objects, TestNG runners, parallelized with Cucable. |
+| `examples/ai-healing-demo` | Deterministic proof that locator healing works — a mock LLM for CI, plus live runs for Anthropic / OpenAI / Ollama. |
+| `examples/web-patterns-demo` | Recipes for tricky web patterns with local fixtures: tables, HTML5 drag-drop, file upload/download, PDF text, QR decode, OCR. |
 
 ## Requirements
 
 - JDK 21
-- Maven 3.9+ (or just use the bundled `./mvnw`)
+- Maven 3.9+ (or just use the bundled `./mvnw` / `mvnw.cmd`)
+- Chrome or Firefox for the browser suites. WebDriverManager downloads the matching
+  driver binary on first run, so the machine needs internet access then; once cached
+  (`~/.cache/selenium`), runs work offline.
 
-## Running the example tests
+## Quickstart
 
+Run the framework unit tests (no browser needed):
+
+```bash
+./mvnw -pl framework -am test
 ```
-./mvnw clean verify -Pintegration-test -DskipTests -pl example-tests -am
+
+Run the parallel example suite (headless Chrome via WebDriverManager):
+
+```bash
+./mvnw clean verify -Pintegration-test -Dheadless=true -pl example-tests -am
 ```
 
-Browser selection: `-Dbrowser=firefox` (defaults to `chrome`).
+Pick a browser: `-Dbrowser=firefox` (default is `chrome`). Omit `-Dheadless=true`
+on a machine with a display if you want to watch the browser.
+
+Run the demos:
+
+```bash
+./mvnw -pl examples/ai-healing-demo -am test      # AI healing, mock LLM
+./mvnw -pl examples/web-patterns-demo -am test    # web patterns, local fixtures
+```
+
+Run everything headlessly in Docker:
+
+```bash
+docker compose build && docker compose run --rm cucumber-examples
+```
 
 ## AI self-healing locators
 
@@ -35,74 +60,22 @@ When a page's `@FindBy` locator can no longer find its element (e.g.
 after a markup change), the framework can ask an LLM for a replacement
 CSS selector and retry once before failing the step.
 
-**You pick the route** — Anthropic BYOK, OpenAI-compatible BYOK (OpenAI,
-Azure, gateways), or **local Ollama**. Nothing is locked to one vendor.
+**You pick the route** — Anthropic BYOK, OpenAI-compatible BYOK, or
+**local Ollama**. Nothing is locked to one vendor. Healing is **off by
+default** until you configure a provider, and no API keys belong in
+source control.
 
-This is **off by default** until you configure a provider. Never commit
-API keys to source control.
-
-### Quick setup (pick one)
-
-**Anthropic (BYOK, legacy env vars still work):**
-
-```
-export AI_HEALING_PROVIDER=anthropic
+```bash
+export AI_HEALING_PROVIDER=anthropic   # or: openai, ollama
 export AI_HEALING_API_KEY=sk-ant-...
-export AI_HEALING_MODEL=claude-sonnet-5   # optional
+./mvnw clean verify -Pintegration-test -Dheadless=true -pl example-tests -am
 ```
 
-**OpenAI or any OpenAI-compatible cloud API (BYOK):**
+Force healing off even when configured: `-Dai.healing.enabled=false`.
 
-```
-export AI_HEALING_PROVIDER=openai
-export AI_HEALING_API_KEY=sk-...
-export AI_HEALING_MODEL=gpt-4o-mini      # optional
-# Optional custom gateway:
-# export AI_HEALING_BASE_URL=https://my-gateway.example/v1
-```
-
-**Local Ollama (no cloud key):**
-
-```
-export AI_HEALING_PROVIDER=ollama
-export AI_HEALING_MODEL=llama3.2         # must be pulled in Ollama first
-# Optional if Ollama is not on localhost:11434
-# export OLLAMA_HOST=http://127.0.0.1:11434
-```
-
-Then run tests as usual:
-
-```
-./mvnw clean verify -Pintegration-test -DskipTests -pl example-tests -am
-```
-
-To force healing off even when configured: `-Dai.healing.enabled=false`.
-
-Every healing call logs token usage and cost (when the model is in the
-pricing table). See `docs/AI_HEALING.md` and `PLAYBOOK.md` for full
-env var reference, CI notes, and cost tracking.
-
-**Runnable demo (no API key required for CI):**
-
-```bash
-./mvnw -pl examples/ai-healing-demo -am test
-```
-
-See `examples/ai-healing-demo/README.md` for mock vs live provider runs.
-
-**Web patterns demo (tables, drag-drop, upload/download, PDF, QR):**
-
-```bash
-./mvnw -pl examples/web-patterns-demo -am test
-```
-
-**Docker (all example modules headlessly):**
-
-```bash
-docker compose build && docker compose run --rm cucumber-examples
-```
-
-MCP agent playbook: `docs/MCP_PLAYBOOK.md`.
+Every healing call logs token usage and cost; a session total is
+logged at JVM exit. Full provider setup, the env var reference, and
+cost tracking: [`docs/AI_HEALING.md`](docs/AI_HEALING.md).
 
 ```mermaid
 flowchart TD
@@ -119,7 +92,13 @@ flowchart TD
 
 ## Using `framework` in your own project
 
-Add it as a dependency once it's built or published:
+Build and install it locally:
+
+```bash
+./mvnw -pl framework -am install
+```
+
+Then depend on it like any other library:
 
 ```xml
 <dependency>
@@ -129,18 +108,22 @@ Add it as a dependency once it's built or published:
 </dependency>
 ```
 
-Then extend `com.cucumberbddparallel.framework.page.BasePage` for your
-page objects, wire `com.cucumberbddparallel.framework.driver.Setup`
-and `TearDown` into your runner's `glue`, and you get driver
-management, waits, and optional AI healing for free. `example-tests`
-is a working reference for exactly this setup.
+Extend `com.cucumberbddparallel.framework.page.BasePage` for your page
+objects, wire `com.cucumberbddparallel.framework.driver.Setup` and
+`TearDown` into your runner's `glue`, and you get driver management,
+waits, and optional AI healing for free. `example-tests` is a working
+reference for exactly this setup.
 
-## More detail
+## Docs
 
-`PLAYBOOK.md` covers the architecture decisions, the SOLID reasoning
-behind them, the full AI cost model, CI internals, and how to extend
-the framework - written for someone who's going to build on this, not
-just run it.
+| Doc | For |
+|---|---|
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Module map, parallel execution flow, scenario lifecycle, healing sequence, provider abstraction, CI and Docker topology — with diagrams |
+| [`docs/AI_HEALING.md`](docs/AI_HEALING.md) | Provider setup, full env var reference, reliability behavior, cost tracking, troubleshooting |
+| [`PLAYBOOK.md`](PLAYBOOK.md) | Architecture decisions, SOLID reasoning, the AI cost model, CI internals, extending the framework |
+| [`docs/MCP_PLAYBOOK.md`](docs/MCP_PLAYBOOK.md) | Driving the fixtures with an MCP Selenium agent for exploration |
+| [`examples/ai-healing-demo/README.md`](examples/ai-healing-demo/README.md) | Mock vs live healing demo runs |
+| [`examples/web-patterns-demo/README.md`](examples/web-patterns-demo/README.md) | Web pattern recipes |
 
 ## Author
 

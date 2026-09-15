@@ -1,5 +1,5 @@
 # Run all example modules headlessly — Chrome + Tesseract for OCR profile.
-FROM maven:3.9.9-eclipse-temurin-21
+FROM maven:3.9.16-eclipse-temurin-21
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -20,7 +20,7 @@ COPY . .
 
 # Framework unit tests + CI-safe demos (mock AI + web patterns). OCR runs in compose profile.
 RUN ./mvnw -B -pl framework test \
-    && ./mvnw -B -pl examples/ai-healing-demo -am test -Dtest=MockAiHealingDemoTest -Dsurefire.failIfNoSpecifiedTests=false \
-    && ./mvnw -B -pl examples/web-patterns-demo -am test -Dsurefire.failIfNoSpecifiedTests=false
+    && ./mvnw -B -pl examples/ai-healing-demo -am test -Dtest=MockAiHealingDemoTest -Dsurefire.failIfNoSpecifiedTests=false -Dheadless=true \
+    && ./mvnw -B -pl examples/web-patterns-demo -am test -Dsurefire.failIfNoSpecifiedTests=false -Dheadless=true
 
-CMD ["./mvnw", "-B", "-pl", "examples/web-patterns-demo,examples/ai-healing-demo", "-am", "test", "-Dsurefire.failIfNoSpecifiedTests=false"]
+CMD ["./mvnw", "-B", "-pl", "examples/web-patterns-demo,examples/ai-healing-demo", "-am", "test", "-Dsurefire.failIfNoSpecifiedTests=false", "-Dheadless=true"]

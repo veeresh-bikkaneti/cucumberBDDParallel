@@ -6,6 +6,11 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -152,30 +157,22 @@ public final class WebPatternsFixtureServer {
         return out.toByteArray();
     }
 
-    private static byte[] buildSamplePdf() {
-        String pdf = """
-                %PDF-1.4
-                1 0 obj<< /Type /Catalog /Pages 2 0 R >>endobj
-                2 0 obj<< /Type /Pages /Kids [3 0 R] /Count 1 >>endobj
-                3 0 obj<< /Type /Page /Parent 2 0 R /MediaBox [0 0 400 200] /Contents 4 0 R /Resources<< /Font<< /F1 5 0 R >> >> >>endobj
-                4 0 obj<< /Length 55 >>stream
-                BT /F1 18 Tf 50 120 Td (Invoice QA-2026) Tj ET
-                endstream
-                endobj
-                5 0 obj<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>endobj
-                xref
-                0 6
-                0000000000 65535 f
-                0000000009 00000 n
-                0000000058 00000 n
-                0000000115 00000 n
-                0000000264 00000 n
-                0000000371 00000 n
-                trailer<< /Root 1 0 R /Size 6 >>
-                startxref
-                447
-                %%EOF
-                """;
-        return pdf.getBytes(StandardCharsets.US_ASCII);
+    private static byte[] buildSamplePdf() throws IOException {
+        // Built with real PDFBox - the previous hand-rolled PDF had wrong xref offsets and a
+        // wrong stream length, which strict parsers reject.
+        try (PDDocument document = new PDDocument()) {
+            PDPage page = new PDPage();
+            document.addPage(page);
+            try (PDPageContentStream content = new PDPageContentStream(document, page)) {
+                content.beginText();
+                content.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 18);
+                content.newLineAtOffset(50, 700);
+                content.showText("Invoice QA-2026");
+                content.endText();
+            }
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            document.save(out);
+            return out.toByteArray();
+        }
     }
 }
