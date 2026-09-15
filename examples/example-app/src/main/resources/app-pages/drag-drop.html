@@ -19,7 +19,10 @@
   <script>
     var source = document.getElementById('drag-source');
     var target = document.getElementById('drop-target');
-    var status = document.getElementById('drop-status');
+    // NOTE: the variable is intentionally named statusEl, not status -
+    // window.status is a built-in string property, so `var status = ...`
+    // would invoke its setter and silently drop the element reference.
+    const statusEl = document.getElementById('drop-status');
 
     source.addEventListener('dragstart', function (e) {
       // The id travels on the drag's DataTransfer, exactly like a real user drag -
@@ -38,7 +41,7 @@
     target.addEventListener('drop', function (e) {
       e.preventDefault();
       var id = e.dataTransfer.getData('text/plain');
-      status.textContent = 'Dropped: ' + id;
+      statusEl.textContent = 'Dropped: ' + id;
     });
   </script>
 </body>
