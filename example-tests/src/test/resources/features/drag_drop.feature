@@ -1,6 +1,7 @@
 Feature: Drag and drop
-  The framework's DragDropHelper wraps Selenium's Actions API, including the
-  HTML5 drag-and-drop fallback for pages where native events don't fire.
+  The framework's DragDropHelper fires the HTML5 drag-and-drop event sequence
+  (dragstart → dragover → drop → dragend) with an injected DataTransfer,
+  falling back to Selenium's Actions API only if JavaScript injection fails.
 
   Scenario: Dragging the source onto the target updates the status
     Given a user is on the drag and drop page

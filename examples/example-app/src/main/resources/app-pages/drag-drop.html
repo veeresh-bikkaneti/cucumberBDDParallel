@@ -20,45 +20,25 @@
     var source = document.getElementById('drag-source');
     var target = document.getElementById('drop-target');
     var status = document.getElementById('drop-status');
-    // Remembered on dragstart as a fallback: synthetic DragEvents built by test
-    // helpers sometimes carry a DataTransfer that survives the round trip, sometimes
-    // not - either way the drop handler resolves the source id.
-    var draggedId = null;
 
     source.addEventListener('dragstart', function (e) {
-      draggedId = source.id;
-      if (e.dataTransfer) {
-        e.dataTransfer.setData('text/plain', source.id);
-        e.dataTransfer.effectAllowed = 'move';
-      }
+      // The id travels on the drag's DataTransfer, exactly like a real user drag -
+      // the framework's DragDropHelper fires these events synthetically with a
+      // working DataTransfer, so no fallback state is needed.
+      e.dataTransfer.setData('text/plain', source.id);
+      e.dataTransfer.effectAllowed = 'move';
     });
 
     target.addEventListener('dragover', function (e) {
       // Required: without preventDefault the drop event never fires.
       e.preventDefault();
-      if (e.dataTransfer) {
-        e.dataTransfer.dropEffect = 'move';
-      }
+      e.dataTransfer.dropEffect = 'move';
     });
 
     target.addEventListener('drop', function (e) {
       e.preventDefault();
-      var id = draggedId;
-      if (e.dataTransfer) {
-        try {
-          var fromData = e.dataTransfer.getData('text/plain');
-          if (fromData) {
-            id = fromData;
-          }
-        } catch (err) {
-          // Some synthetic DataTransfer shims throw on getData - fall back to dragstart.
-        }
-      }
+      var id = e.dataTransfer.getData('text/plain');
       status.textContent = 'Dropped: ' + id;
-    });
-
-    source.addEventListener('dragend', function () {
-      draggedId = null;
     });
   </script>
 </body>

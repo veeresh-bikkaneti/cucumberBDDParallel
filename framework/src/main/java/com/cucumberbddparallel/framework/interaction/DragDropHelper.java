@@ -17,25 +17,41 @@ import java.util.Objects;
  * (dragstart → dragover → drop → dragend) with an injected {@code DataTransfer} object
  * via JavaScript. That's what most HTML5 drop targets actually listen for - plain
  * {@code Actions} mouse events often don't trigger them at all, because no
- * {@code DataTransfer} is ever created. If the JS injection fails (e.g. the driver
- * doesn't support it), it falls back to the classic Actions-based drag.
+ * {@code DataTransfer} is ever created.
+ *
+ * <p>The {@code DataTransfer} is attached with {@code Object.defineProperty} rather than
+ * through the {@code DragEvent} constructor's init dictionary: several browsers ignore
+ * the init member and leave {@code event.dataTransfer} {@code null}, which silently
+ * breaks drop handlers that read it. Defining it as an own property on each dispatched
+ * event shadows the prototype getter and works everywhere. One {@code DataTransfer} is
+ * shared by the whole gesture, exactly like a real user drag.
+ *
+ * <p>If the JS injection fails (e.g. the driver doesn't support it), it falls back to
+ * the classic Actions-based drag and logs a warning - a silent fallback here would turn
+ * a clear scripting error into a mysterious timeout in the calling test.
  */
 public final class DragDropHelper {
 
     private static final Logger LOG = LoggerFactory.getLogger(DragDropHelper.class);
 
-    // Fires the full HTML5 DnD lifecycle against the source and target. Uses the modern
-    // DragEvent constructor with a real DataTransfer so drop handlers reading
-    // event.dataTransfer see what they'd see from a genuine user drag.
+    // Fires the full HTML5 DnD lifecycle against the source and target. Each event gets
+    // the shared DataTransfer injected via defineProperty (see the class javadoc for why
+    // the DragEvent constructor's init dict isn't used for it).
     private static final String JS_DRAG_AND_DROP = """
-            const dataTransfer = new DataTransfer();
             const source = arguments[0];
             const target = arguments[1];
-            const eventInit = {dataTransfer: dataTransfer, bubbles: true, cancelable: true};
-            source.dispatchEvent(new DragEvent('dragstart', eventInit));
-            target.dispatchEvent(new DragEvent('dragover', eventInit));
-            target.dispatchEvent(new DragEvent('drop', eventInit));
-            source.dispatchEvent(new DragEvent('dragend', eventInit));
+            // One DataTransfer shared by the whole gesture, like a real user drag: the
+            // page's dragstart handler fills it in, the drop handler reads it back.
+            const dataTransfer = new DataTransfer();
+            function fireDragEvent(element, type) {
+                const event = new DragEvent(type, {bubbles: true, cancelable: true});
+                Object.defineProperty(event, 'dataTransfer', {value: dataTransfer});
+                element.dispatchEvent(event);
+            }
+            fireDragEvent(source, 'dragstart');
+            fireDragEvent(target, 'dragover');
+            fireDragEvent(target, 'drop');
+            fireDragEvent(source, 'dragend');
             """;
 
     private final WebDriver driver;
@@ -50,7 +66,8 @@ public final class DragDropHelper {
         try {
             ((JavascriptExecutor) driver).executeScript(JS_DRAG_AND_DROP, source, target);
         } catch (WebDriverException | ClassCastException e) {
-            LOG.debug("JS drag-and-drop failed; falling back to Actions-based drag", e);
+            LOG.warn("JS drag-and-drop failed; falling back to Actions-based drag. "
+                    + "HTML5 drop targets may not recognize the fallback.", e);
             dragAndDropViaActions(source, target);
         }
     }

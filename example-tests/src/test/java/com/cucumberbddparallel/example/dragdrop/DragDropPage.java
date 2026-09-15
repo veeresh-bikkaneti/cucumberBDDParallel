@@ -46,20 +46,25 @@ public class DragDropPage extends BasePage {
         wait.forElementToBeDisplayed(5, this.dragSource, "Drag source");
         wait.forElementToBeDisplayed(5, this.dropTarget, "Drop target");
         this.dragDrop.dragAndDrop(this.dragSource, this.dropTarget);
+        // The synthetic drop is synchronous, so log the status right away: if the drop
+        // didn't register, this line shows it in CI logs instead of a bare timeout later.
+        LOG.info("Drag executed; drop status now reads \"{}\"", this.dropStatus.getText());
     }
 
     /**
-     * After a successful drop the status flips from "Waiting for drop…" to "Dropped: …".
-     * The status element is visible from page load, so waiting for visibility alone could
-     * read the pre-drop text if the drop event fires late - instead we wait for the text
-     * itself to change.
+     * After a successful drop the status flips from "Waiting for drop…" to
+     * "Dropped: drag-source". The status element is visible from page load, so waiting
+     * for visibility alone could read the pre-drop text if the drop event fires late -
+     * instead we wait for the exact post-drop text. Asserting the full string (not just
+     * the "Dropped:" prefix) keeps the example honest: a drop that carries no id would
+     * otherwise pass.
      */
     void checkDropSucceeded() {
         new WebDriverWait(driver, Duration.ofSeconds(10)).until(
-                d -> this.dropStatus.getText().startsWith("Dropped:"));
+                d -> "Dropped: drag-source".equals(this.dropStatus.getText()));
         String status = this.dropStatus.getText();
         LOG.info("Drop status: \"{}\"", status);
-        Assert.assertTrue(status.startsWith("Dropped:"),
-                "Expected drop status to start with \"Dropped:\" but was \"" + status + "\"");
+        Assert.assertEquals(status, "Dropped: drag-source",
+                "Expected drop status \"Dropped: drag-source\" but was \"" + status + "\"");
     }
 }
